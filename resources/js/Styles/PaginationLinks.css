@@ -1,0 +1,27 @@
+.pagination-active-button{
+    color: white ;
+    background-color: #111827 ;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.pagination-inactive-button{
+    color: #2d5758;
+    background-color: #9ca3af ;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.pagination-inactive-button:hover{
+    color: white;
+    background-color: #111827 ;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.pagination-inactive-button.cursor-not-allowed:hover{
+    color: #2d5758;
+    background-color: #9ca3af ;
+    font-weight: bold;
+    font-size: 1.1rem;
+}

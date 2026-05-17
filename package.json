@@ -21,6 +21,8 @@
     },
     "dependencies": {
         "primeicons": "^7.0.0",
-        "primevue": "^4.5.5"
+        "primevue": "^4.5.5",
+        "vue-i18n": "^11.4.2",
+        "vue-toastification": "^2.0.0-rc.5"
     }
 }

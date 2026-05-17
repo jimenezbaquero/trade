@@ -10,26 +10,29 @@ class ExchangePresenter
             'name' => [
                 'key' => 'name',
                 'field' => 'name',
-                'header' => 'Name',
+                'header' => 'exchange.fields.name',
                 'sortable' => true,
                 'filterable' => true,
                 'type' => 'text',
+                'width' => 'auto'
             ],
             'slug' => [
                 'key' => 'slug',
                 'field' => 'slug',
-                'header' => 'Slug',
+                'header' => 'exchange.fields.slug',
                 'sortable' => true,
                 'filterable' => true,
                 'type' => 'text',
+                'width' => '250px'
             ],
             'is_active' => [
                 'key' => 'is_active',
                 'field' => 'is_active',
-                'header' => 'Active',
+                'header' => 'exchange.fields.is_active',
                 'sortable' => false,
-                'filterable' => true,
-                'type' => 'boolean',
+                'filterable' => false,
+                'type' => 'funnel',
+                'width' => '150px'
             ],
         ];
     }

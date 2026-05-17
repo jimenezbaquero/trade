@@ -1,0 +1,50 @@
+{
+  "app.yes": "Sí",
+  "app.no": "No",
+  "app.cancel": "Cancelar",
+  "app.delete_error": "Error al eliminar el registro",
+  "app.delete_success": "Registro eliminado correctamente",
+
+
+  "datatable.show": "Mostrar",
+  "datatable.per_page": "por página",
+  "datatable.no_data": "Sin datos",
+  "datatable.actions": "Acciones",
+
+  "exchange.create": "Crear Exchange",
+  "exchange.create_description": "Configuración general del exchange",
+
+  "exchange.delete_title": "Eliminar exchange",
+  "exchange.delete_confirm": "¿Está seguro de que desea eliminar este exchange?",
+
+  "exchange.title": "Exchanges",
+
+  "exchange.fields.name": "Nombre",
+  "exchange.fields.slug": "Slug",
+  "exchange.fields.api_url": "API URL",
+  "exchange.fields.testnet_api_url": "Testnet API URL",
+  "exchange.fields.websocket_url": "Websocket URL",
+  "exchange.fields.testnet_websocket_url": "Testnet Websocket URL",
+  "exchange.fields.rate_limit": "Rate Limit",
+  "exchange.fields.metadata": "Metadata (JSON)",
+  "exchange.fields.is_active": "Activo?",
+
+  "exchange.actions.create": "Crear Exchange",
+  "exchange.actions.update": "Actualizar Exchange",
+
+  "exchange.messages.created_successfully": "Exchange creado correctamente",
+  "exchange.messages.created_error": "Ha ocurrido un error al crear el exchange",
+  "exchange.messages.updated_successfully": "Exchange actualizado correctamente",
+  "exchange.messages.updated_error": "Ha ocurrido un error al actualizar el exchange",
+
+  "filter.clean_filters": "Limpiar filtros",
+  "filter.select_all": "Seleccionar todos",
+  "filter.filter": "Filtrar",
+  "filter.clean": "Limpiar",
+
+  "index.total_registers": "Total registros",
+  "index.add_register": "Añadir registro",
+
+  "order.asc": "Ascendente",
+  "order.desc": "Descendente"
+}

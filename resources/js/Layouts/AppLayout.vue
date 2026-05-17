@@ -1,5 +1,15 @@
 <script setup>
 import Sidebar from '@/Components/Sidebar.vue'
+import Header from "@/Components/Header.vue";
+import { usePage } from '@inertiajs/vue3'
+import { computed } from 'vue'
+import { watch } from 'vue'
+import { useToast } from 'vue-toastification'
+
+const page = usePage()
+const toast = useToast()
+
+const flash = computed(() => page.props.flash || {})
 
 defineProps({
   loading: {
@@ -7,6 +17,30 @@ defineProps({
     default: false
   }
 })
+
+watch(
+  () => page.props.flash,
+  (flash) => {
+    if (!flash) return
+    
+    if (flash.success) {
+      toast.success(flash.success)
+    }
+    
+    if (flash.error) {
+      toast.error(flash.error)
+    }
+    
+    if (flash.warning) {
+      toast.warning(flash.warning)
+    }
+    
+    if (flash.info) {
+      toast.info(flash.info)
+    }
+  },
+  { deep: true, immediate: true }
+)
 </script>
 
 <template>
@@ -19,11 +53,7 @@ defineProps({
     <div class="flex-1 flex flex-col overflow-hidden">
       
       <!-- TOP BAR -->
-      <header class="h-14 bg-white border-b flex items-center px-4">
-        <h1 class="text-sm font-semibold text-gray-700">
-          Trading Dashboard
-        </h1>
-      </header>
+      <Header class="h-14 bg-white border-b flex items-center px-4 justify-end" />
       
       <!-- PAGE CONTENT -->
       <main class="flex-1 overflow-y-auto p-4">

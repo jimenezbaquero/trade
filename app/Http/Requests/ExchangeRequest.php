@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ExchangeRequest extends FormRequest
 {
@@ -12,7 +13,7 @@ class ExchangeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,17 +25,28 @@ class ExchangeRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string'],
-            'slug' => ['required', 'string', 'unique:exchanges,slug'],
-            
+            'slug' => ['required', 'string',  Rule::unique('exchanges', 'slug')
+                ->ignore($this->route('exchange'))],
             'api_url' => ['nullable', 'url'],
             'testnet_api_url' => ['nullable', 'url'],
-            
             'websocket_url' => ['nullable', 'string'],
             'testnet_websocket_url' => ['nullable', 'string'],
-            
             'rate_limit' => ['nullable', 'integer'],
-            
             'is_active' => ['boolean'],
+        ];
+    }
+    
+    public function attributes(): array
+    {
+        return [
+            'name' => mb_strtolower(__('exchange.fields.name')),
+            'slug' => mb_strtolower(__('exchange.fields.slug')),
+            'api_url' => mb_strtolower(__('exchange.fields.api_url')),
+            'testnet_api_url' => mb_strtolower(__('exchange.fields.testnet_api_url')),
+            'websocket_url' => mb_strtolower(__('exchange.fields.websocket_url')),
+            'testnet_websocket_url' => mb_strtolower(__('exchange.fields.testnet_websocket_url')),
+            'rate_limit' => mb_strtolower(__('exchange.fields.rate_limit')),
+            'is_active' => mb_strtolower(__('exchange.fields.is_active')),
         ];
     }
 }

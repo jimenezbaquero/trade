@@ -26,7 +26,7 @@ class FilterHelper
                 
                 'text' => self::applyTextFilter($query, $field, $value),
                 
-                'boolean' => self::applyBooleanFilter($query, $field, $value),
+                'funnel' => self::applyFunnelFilter($query, $filter),
                 
                 'number' => self::applyNumberFilter($query, $field, $op, $value),
                 
@@ -42,9 +42,20 @@ class FilterHelper
         return $query->where($field, 'like', "%{$value}%");
     }
     
-    private static function applyBooleanFilter(Builder $query, string $field, bool $value): Builder
+    private static function applyFunnelFilter(Builder $query, array $filter): Builder
     {
-        return $query->where($field, '=', $value);
+        $unique = true;
+        foreach ($filter['options'] as $option) {
+            if($option['checked'] === 'true') {
+                if($unique) {
+                    $query->where($filter['field'], $option['value']);
+                    $unique = false;
+                }else{
+                    $query->orWhere($filter['field'], $option['value']);
+                }
+            }
+        }
+        return $query;
     }
     
     private static function applyNumberFilter(Builder $query, string $field, string $op, $value): Builder

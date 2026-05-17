@@ -20,6 +20,14 @@ import { Link } from '@inertiajs/vue3'
       >
         Exchanges
       </Link>
+      
+      <Link
+        href="/dashboard"
+        class="block px-3 py-2 rounded hover:bg-gray-800"
+        :class="{ 'bg-gray-800': $page.url.startsWith('/pairs') }"
+      >
+        Pares
+      </Link>
     
     </nav>
   

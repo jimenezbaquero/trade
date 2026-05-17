@@ -1,0 +1,485 @@
+
+.font-size-13 {
+    font-size: 13px;
+}
+
+.margin-auto-style {
+    margin: auto;
+}
+
+.horizontal-line {
+    border-top-width: 1px;
+    border-color: lightgray;
+    width: 100%;
+}
+
+.horizontal-line-header {
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-color: lightgray;
+    width: 100%;
+}
+
+.filter-icon {
+    position: relative;
+    top: 5px;
+}
+
+.filter-icon-180deg {
+    transform: rotate(180deg);
+    position: relative;
+    bottom: 5px;
+}
+
+.filter-input-text {
+    font-weight: bold;
+}
+
+.filter-input-text:focus {
+    outline: none;
+}
+
+.filter__checkbox {
+    position: absolute;
+    top: 100%;
+    left: -50%;
+    width: 400px;
+    z-index: 999;
+    min-height: 200px;
+    max-height: 650px;
+    padding: 0px 20px 20px 20px;
+    margin: 0px;
+    background-color: #faf8f8;
+    border-radius: 2%;
+    border: 1px solid #e5e5e5;
+    overflow-y: auto;
+
+    .filter__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #e5e5e5;
+        padding-top: 20px;
+        padding-bottom: 10px;
+        background-color: #faf8f8;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+
+        .filter__title {
+            font-size: 1.4rem;
+        }
+
+        .clean__link {
+            font-size: 1em;
+            cursor: pointer;
+            color: #8bad00;
+        }
+
+        .clean__link:hover {
+            color: darkgreen;
+        }
+    }
+
+    .filter__body {
+        margin-top: 20px;
+
+        .block {
+            margin-top: 6px;
+        }
+    }
+}
+
+.filter__general {
+    h3.header-text {
+        font-size: 1rem;
+        font-weight: bold;
+        margin: 0;
+        padding: 10px 0;
+    }
+}
+
+.truncate-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+.text-centered {
+    text-align: center;
+}
+
+.inactive {
+    background-color: #dee0e1;
+    border-top: 1px solid white;
+}
+
+.inactive:hover {
+    background-color: #f0f0f0;
+}
+
+.status span {
+    margin: auto;
+    height: inherit;
+    align-items: center;
+    display: flex;
+}
+
+.select__wrapper {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.custom-select {
+    appearance: none;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    font-size: 14px;
+    border-radius: 4px;
+    background-color: white;
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="none" stroke="currentColor" stroke-width="1" d="M0 0l2 2 2-2"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 8px 10px;
+    padding-right: 30px;
+}
+
+.custom-select:focus {
+    outline: none;
+    border-color: #8bad00;
+}
+
+.pagination__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.pagination__wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.filter-input-underline {
+    border: none;
+    border-bottom: 1px solid #ccc;
+    padding: 5px 0;
+    background: none;
+}
+
+.filter-input-underline:focus {
+    border-bottom: 1px solid #000;
+    outline: none;
+}
+
+.no-border-input {
+    border: none;
+    padding: 5px 0;
+    background: none;
+    font-weight: normal;
+}
+
+.no-border-input::placeholder {
+    color: #000;
+    opacity: 1;
+    font-weight: bold;
+}
+
+.no-border-input:focus::placeholder {
+    opacity: 0;
+}
+
+.no-border-input:focus {
+    outline: red !important;
+    border-bottom: 1px solid #000;
+    box-shadow: none;
+}
+
+.edit-button svg,
+.delete-button svg {
+    width: 24px;
+    height: 24px;
+}
+
+.actions-column-header {
+    text-align: center;
+    width: 120px;
+}
+
+.actions-column {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 120px;
+}
+
+.action-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.action-icon {
+    width: 100%;
+    height: 100%;
+}
+
+.edit-columns-btn {
+    color: #8bad00;
+    padding: 0.5rem 1rem 0.5rem 0.5rem;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    margin-left: 0;
+}
+
+.edit-columns-container {
+    cursor: pointer;
+}
+
+.component-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 0;
+    border-bottom: 2px solid #8bad00;
+    margin: 0;
+}
+
+.view-actions {
+    display: flex;
+    align-items: center;
+}
+
+.enrollmentNumber {
+    font-size: 16px;
+    color: #555;
+}
+
+.number {
+    font-weight: bold;
+}
+
+.general-container {
+    font-size: 85%;
+}
+.filter--input,
+.filter__general,
+.actions-column-header {
+    font-size: 1rem;
+    padding: 10px 0;
+}
+.filter--input::placeholder {
+    font-size: 1rem;
+}
+
+.filter--input.no-border-input,
+.filter__general,
+.actions-column-header {
+    font-weight: bold;
+}
+
+.filter__general {
+    min-width: 0;
+    flex: 1;
+}
+
+.filter--input.no-border-input:focus::placeholder {
+    opacity: 0;
+}
+
+input[type="checkbox"] {
+    appearance: none;
+    background-color: #fff;
+    border: 2px solid #7aa300;
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+}
+
+input[type="checkbox"]:hover {
+    background-color: #7aa300;
+}
+
+input[type="checkbox"]:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+input[type="checkbox"]:checked {
+    background-color: #7aa300;
+    border-color: #7aa300;
+}
+
+input[type="checkbox"]:checked::after {
+    color: white;
+    font-size: 14px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+input[type="checkbox"]::before {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    box-sizing: border-box;
+}
+
+input[type="checkbox"]:checked::before {
+    background-color: #7aa300;
+    border-color: #7aa300;
+}
+
+input[type="checkbox"]:disabled {
+    background-color: #cfcfcf;
+    border-color: #cfcfcf;
+    cursor: not-allowed;
+}
+
+.link-cell {
+    cursor: pointer;
+    color: #7aa300;
+    text-decoration: underline;
+}
+
+.tabs {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 0;
+}
+
+.tabs button {
+    background: none;
+    border: none;
+    padding: 5px 45px;
+    cursor: pointer;
+    color: #333;
+    font-weight: bold;
+    font-size: 1.1rem;
+    border-bottom: 2px solid transparent;
+    transition: border-bottom-color 0.3s;
+    margin: 0;
+}
+
+.tabs button:hover {
+    color: #8bad00;
+}
+
+.tabs button.active-tab {
+    color: #fff;
+    background-color: #8bad00;
+    border-bottom-color: #8bad00;
+}
+
+.clickable-row {
+    cursor: pointer;
+}
+
+.clickable-row:hover {
+    background-color: #f0f0f0;
+}
+
+.funnel-icon,
+.sort-icon {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+    max-width: 20px;
+    max-height: 20px;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+.funnel-button {
+    display: flex;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+td {
+    padding: 0 10px;
+    border-bottom: 1px solid #ddd;
+    box-sizing: border-box;
+}
+
+th {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+    position: relative;
+}
+
+th .flex,
+td .flex {
+    min-width: 0;
+}
+
+td.text-right {
+    text-align: right;
+}
+
+td.text-right .flex {
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.sign-state,
+.employee-state{
+    display:block;
+    text-align: center;
+    color: white;
+    padding:2px 0px;
+    border-radius: 5px;
+}
+
+.signed,
+.state-stable{
+    background-color: #BED249;
+}
+.unsigned {
+    background-color: #D13B3B;
+}
+
+.state-pendingpt{
+    background-color: #00B5CF;
+}
+
+.state-pendingid{
+    background-color: #F7A812;
+}
+
+.state-inprocess{
+    background-color: #000;
+}
+
+.showSelected:hover{
+    cursor:pointer;
+    font-weight: bold ;
+}
+
+.table-scroll-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
