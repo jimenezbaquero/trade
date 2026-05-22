@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ExchangeController;
+use App\Http\Controllers\PairController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,9 @@ Route::middleware('auth')->group(function () {
     
     Route::resource('exchanges', ExchangeController::class);
     Route::post('exchanges/getData', [ExchangeController::class, 'getData'])->name('exchanges.getData');
+    
+    Route::resource('pairs', PairController::class);
+    Route::post('pairs/getData', [PairController::class, 'getData'])->name('pairs.getData');
 });
 
 require __DIR__.'/auth.php';

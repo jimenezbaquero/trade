@@ -138,6 +138,13 @@ class ExchangeController extends Controller
     private function getFilters(Request $request): array
     {
         return [
+            'name' => [
+                'value' => '',
+                'type' => 'text',
+                'field' => 'name',
+                'operator' => 'like',
+                'order_direction' => '',
+            ],
             'slug' => [
                 'value' => '',
                 'type' => 'text',
@@ -153,13 +160,6 @@ class ExchangeController extends Controller
                 'order_direction' => '',
                 'showFunnel' => false,
                 'options' => FunnelHelper::getOptions('is_active'),
-            ],
-            'name' => [
-                'value' => '',
-                'type' => 'text',
-                'field' => 'name',
-                'operator' => 'like',
-                'order_direction' => '',
             ],
             'created_at' => [
                 'value' => '',

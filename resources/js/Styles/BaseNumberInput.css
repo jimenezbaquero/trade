@@ -1,0 +1,26 @@
+.base-input-number {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.875rem;
+
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+
+    background-color: #ffffff;
+    color: #111827;
+
+    outline: none;
+
+    transition: all 0.2s ease-in-out;
+}
+
+.base-input-number:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.text-error {
+    font-size: 0.875rem; /* text-sm */
+    color: #ef4444;      /* text-red-500 */
+    margin-top: 0.25rem; /* mt-1 */
+}

@@ -18,7 +18,7 @@ class FilterHelper
             $op = $filter['operation'] ?? '=';
             $value = $filter['value'];
             
-            if ($value === null || $value === '') {
+            if ($type !== 'funnel' &&($value === null || $value === '')) {
                 continue;
             }
             
@@ -46,7 +46,7 @@ class FilterHelper
     {
         $unique = true;
         foreach ($filter['options'] as $option) {
-            if($option['checked'] === 'true') {
+            if($option['checked'] || $option['checked'] === 'true') {
                 if($unique) {
                     $query->where($filter['field'], $option['value']);
                     $unique = false;

@@ -22,7 +22,7 @@ import { Link } from '@inertiajs/vue3'
       </Link>
       
       <Link
-        href="/dashboard"
+        href="/pairs"
         class="block px-3 py-2 rounded hover:bg-gray-800"
         :class="{ 'bg-gray-800': $page.url.startsWith('/pairs') }"
       >

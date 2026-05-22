@@ -46,5 +46,41 @@
   "index.add_register": "Añadir registro",
 
   "order.asc": "Ascendente",
-  "order.desc": "Descendente"
+  "order.desc": "Descendente",
+
+
+  "pair.create_description": "Formulario para la creación de pares.",
+  "pair.title": "Par",
+  "pair.title_plural": "Pares",
+
+  "pair.fields.exchange": "Exchange",
+  "pair.fields.base_asset": "Activo base",
+  "pair.fields.quote_asset": "Activo cotizado",
+  "pair.fields.symbol": "Símbolo",
+  "pair.fields.status": "Estado",
+  "pair.fields.price_precision": "Precisión de precio",
+  "pair.fields.quantity_precision": "Precisión de cantidad",
+  "pair.fields.min_qty": "Cantidad mínima",
+  "pair.fields.max_qty": "Cantidad máxima",
+  "pair.fields.tick_size": "Tick size",
+  "pair.fields.step_size": "Step size",
+  "pair.fields.min_notional": "Notional mínimo",
+  "pair.fields.is_active": "Activo",
+  "pair.fields.metadata": "Metadata",
+
+  "pair.messages.created_successfully": "Par creado correctamente",
+  "pair.messages.created_error": "Error al crear el par",
+  "pair.messages.updated_successfully": "Par actualizado correctamente",
+  "pair.messages.updated_error": "Error al actualizar el par",
+  "pair.messages.deleted_successfully": "Par eliminado correctamente",
+  "pair.messages.deleted_error": "Error al eliminar el par",
+
+  "pair.datatable.empty": "No hay pares disponibles",
+  "pair.datatable.loading": "Cargando pares...",
+
+  "pair.actions.create": "Crear par",
+  "pair.actions.update": "Editar par",
+  "pair.actions.delete": "Eliminar par",
+
+  "select.select_option": "Elija una opción..."
 }

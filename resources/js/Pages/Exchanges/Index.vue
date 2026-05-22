@@ -25,7 +25,10 @@
       
       <hr class="mt-6 mb-0">
       
-      <datatable :data="exchangesCopy" :filters="filtersCopy" :columns="props.columns" :actions="props.actions"
+      <datatable :data="exchangesCopy"
+                 :filters="filtersCopy"
+                 :columns="props.columns"
+                 :actions="props.actions"
                  :funnelOptions="funnelOptions"
                  @funnel-filter='onFunnelFilter'
                  @per-page-change="onPerPage"

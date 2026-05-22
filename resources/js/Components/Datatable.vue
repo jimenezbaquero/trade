@@ -11,7 +11,7 @@
             <div class="flex items-center justify-between">
               <div v-if="filters[key].type === 'funnel'" class="flex items-center">
                 <span :class="['funnel-button-' + key]" @click="showChecks(key)"
-                        class="flex items-center cursor-pointer">
+                      class="flex items-center cursor-pointer">
                   <i
                     class="pi funnel-icon"
                     :class="funnelActive(key) ? 'pi-filter-fill' : 'pi-filter'"
@@ -211,6 +211,8 @@ const props = defineProps({
   },
 });
 
+console.log(props.filters)
+
 const emit = defineEmits(['sort-change', 'filter-change', 'page-change', 'per-page-change', 'funnel-filter', 'update', 'delete']);
 
 const perPageOptions = [10, 20, 30, 50, 100];
@@ -233,7 +235,6 @@ function toggleSort(col, order) {
 const onFunnelFilter = (key) => {
   props.filters[key].showFunnel = false;
   funnelActive(key)
-  showChecks(key)
   emit('funnel-filter', {
     col: key
   })
@@ -332,6 +333,6 @@ onUnmounted(() => {
 </script>
 
 <!-- <style src="./styles/simple-index-table.scss"></style> -->
-<style scoped src="@/Styles/datatable.css"></style>
+<style scoped src="@/Styles/Datatable.css"></style>
 
 
