@@ -1,26 +1,26 @@
 <template>
   <Head :title="t('pair.title')" />
-  
+
   <AppLayout :isLoading="isLoading" @resetFilters="resetFilters">
-    
+
     <div class="bg-white rounded-lg shadow-md p-6 min-h-4" style="min-height: 80dvh;">
-      
+
       <!-- HEADER -->
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-title">{{ t('pair.title') }}</h1>
       </div>
-      
+
       <!-- TOP BAR -->
       <div class="flex w-full justify-between">
         <div>
           {{ t('index.total_registers') }}: {{ pairsCopy.total }}
         </div>
-        
+
         <div>
           <button class="btn primary-button" @click="cleanFilters">
             {{ t('filter.clean_filters') }}
           </button>
-          
+
           <Link
             :href="route('pairs.create')"
             class="ml-2 btn primary-button"
@@ -29,10 +29,10 @@
           </Link>
         </div>
       </div>
-      
+
       <br>
       <hr class="mt-6 mb-0">
-      
+
       <!-- DATATABLE -->
       <datatable
         :data="pairsCopy"
@@ -40,7 +40,9 @@
         :columns="props.columns"
         :actions="props.actions"
         :funnelOptions="funnelOptions"
-        
+        :is-row-clickable="true"
+        route-after-click='pairs.show'
+
         @funnel-filter="onFunnelFilter"
         @per-page-change="onPerPage"
         @page-change="onPage"
@@ -48,10 +50,10 @@
         @filter-change="onFilter"
         @update="onUpdate"
         @delete="onDelete"
-        
+
         fontSize="0.8rem"
       />
-      
+
       <!-- DELETE MODAL -->
       <ConfirmModal
         v-if="showConfirmDeleteModal"
@@ -61,9 +63,9 @@
         @confirm="confirmDelete"
         @cancel="cancelDelete"
       />
-    
+
     </div>
-  
+
   </AppLayout>
 </template>
 
@@ -164,9 +166,9 @@ function onFilter(event) {
  * GET DATA
  */
 const getData = async () => {
-  
+
   isLoading.value = true
-  
+
   await axios.post(route('pairs.getData'), filtersCopy.value)
     .then(response => {
       pairsCopy.value = response.data
@@ -191,14 +193,14 @@ function cleanFilters() {
  * RESET FILTERS
  */
 function resetFilters() {
-  
+
   filtersCopy.value.page = 1
-  
+
   Object.keys(props.filters).forEach(key => {
     filtersCopy.value[key].value = ''
-    
+
     if (filtersCopy.value[key].type === 'funnel') {
-      
+
       Object.keys(filtersCopy.value[key].options).forEach(option => {
         filtersCopy.value[key].options[option].checked = false
       })
@@ -210,15 +212,15 @@ function resetFilters() {
  * DELETE CONFIRM
  */
 async function confirmDelete() {
-  
+
   isLoading.value = true
-  
+
   try {
-    
+
     const response = await axios.delete(route('pairs.destroy', {
       pair: registerToDelete.value
     }))
-    
+
     if (response.data.success) {
       toast.success(response.data.message)
       showConfirmDeleteModal.value = false
@@ -226,7 +228,7 @@ async function confirmDelete() {
     } else {
       toast.error(response.data.message)
     }
-    
+
   } catch (e) {
     toast.error(t('app.delete_error'))
   } finally {

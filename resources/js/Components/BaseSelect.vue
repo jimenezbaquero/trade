@@ -1,10 +1,10 @@
 <template>
   <div class="w-full">
-    
+
     <label v-if="label" class="block text-sm font-medium mb-1">
-      {{ label }}
+      {{ t(label) }}
     </label>
-    
+
     <select
       class="base-select"
       :value="modelValue"
@@ -13,7 +13,7 @@
       <option value="" disabled>
         {{ t(placeholder) }}
       </option>
-      
+
       <option
         v-for="option in options"
         :key="optionValue ? option[optionValue] : option"
@@ -22,7 +22,7 @@
         {{ optionLabel ? option[optionLabel] : option }}
       </option>
     </select>
-  
+
   </div>
 </template>
 
@@ -33,30 +33,30 @@ const { t } = useI18n()
 
 const props = defineProps({
   modelValue: [String, Number, Object, null],
-  
+
   options: {
     type: Array,
     default: () => []
   },
-  
+
   label: {
     type: String,
     default: ''
   },
-  
+
   placeholder: {
     type: String,
     default: 'select.select_option'
   },
-  
+
   optionLabel: {
     type: String,
-    default: null
+    default: 'label'
   },
-  
+
   optionValue: {
     type: String,
-    default: null
+    default: 'value'
   }
 })
 

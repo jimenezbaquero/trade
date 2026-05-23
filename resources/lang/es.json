@@ -52,6 +52,8 @@
   "pair.create_description": "Formulario para la creación de pares.",
   "pair.title": "Par",
   "pair.title_plural": "Pares",
+  "pair.timeframe_placeholder": "Seleccione un tiempo de vida",
+  "pair.timeframe": "Tiempo de vida",
 
   "pair.fields.exchange": "Exchange",
   "pair.fields.base_asset": "Activo base",

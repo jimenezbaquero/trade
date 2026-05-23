@@ -13,33 +13,35 @@ return new class extends Migration
     {
         Schema::create('candles', function (Blueprint $table) {
             $table->id();
-            
-            $table->foreignId('trading_pair_id')
+
+            $table->foreignId('pair_id')
                 ->constrained()
                 ->cascadeOnDelete();
-            
+
             $table->string('timeframe', 10)->index();
             // 1m, 5m, 15m, 1h, 4h...
-            
+
+            // TIEMPO
+            $table->timestamp('opened_at')->index();
+            $table->timestamp('closed_at')->index()->nullable();
+
             $table->decimal('open', 20, 8);
             $table->decimal('high', 20, 8);
             $table->decimal('low', 20, 8);
             $table->decimal('close', 20, 8);
-            
+
             $table->decimal('volume', 30, 12);
-            
-            $table->timestamp('opened_at')->index();
-            
+
             $table->timestamps();
-            
+
             $table->unique([
-                'trading_pair_id',
+                'pair_id',
                 'timeframe',
                 'opened_at'
             ], 'candles_unique_idx');
-            
+
             $table->index([
-                'trading_pair_id',
+                'pair_id',
                 'timeframe',
                 'opened_at'
             ], 'candles_lookup_idx');

@@ -20,13 +20,14 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             UserSeeder::class,
             ExchangeSeeder::class,
-            TradingPairSeeder::class
+            PairSeeder::class,
+            CandleSeeder::class
             ]);
-        
-        
-        
-        
 
-        
+
+
+
+
+
     }
 }
