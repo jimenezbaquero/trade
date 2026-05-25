@@ -24,24 +24,17 @@ class GetCandles extends Command
         $this->info('exchange '.$exchange);
 
         $exchange = Exchange::where('slug', 'like', $exchange)->firstOrFail();
-        
+
         $symbol = $this->argument('symbol');
         $interval = $this->argument('interval');
         $from = $this->argument('from');
         $to = $this->option('to')? strtotime($this->option('to')) * 1000 : now()->getTimestampMs();
-        
+
         $pair = $exchange->pairs()->where('symbol', $symbol)->firstOrFail();
-        
-        $mapInterval = [
-            '1m' => 59,
-            '5m' => 299,
-            '15m' => 899,
-            '1h' => 3599,
-        ];
-        
+
         if($from == 'live'){
             $lastCandle = $pair->candles()->where('timeframe', $interval)->latest('opened_at')->first();
-            
+
             if($lastCandle){
                 $from = $lastCandle->opened_at
                     ->subMinute()
@@ -56,8 +49,9 @@ class GetCandles extends Command
             $from = strtotime($this->argument('from')) * 1000;
         }
         
+
         $client = $exchangeManager->make($exchange);
-        
+
         while ($from <= $to) {
             $klines = $client->klines(
                 $symbol,
@@ -66,41 +60,43 @@ class GetCandles extends Command
                 $to,
                 1000
             );
-            
+
             if (empty($klines)) {
                 break;
             }
-            
-            $batch = [];
 
-            foreach ($klines as $k) {
+            $batch = [];
+            $numberKlines = count($klines);
+
+            foreach ($klines as $index=>$k) {
+                $isLast = $index === $numberKlines - 1;
 
                 $batch[] = [
                     'pair_id' => $pair->id,
                     'timeframe' => $interval,
-                    
+
                     'opened_at' => date('Y-m-d H:i:s', $k[0] / 1000),
                     'closed_at' => date('Y-m-d H:i:s', $k[6] / 1000),
-                    'is_closed' => (($k[6] / 1000) >= (($k[0] / 1000) + $mapInterval[$interval])),
-                    
+                    'is_closed' => !$isLast,
+
                     'open' => $k[1],
                     'high' => $k[2],
                     'low' => $k[3],
                     'close' => $k[4],
-                    
+
                     'volume' => $k[5],
                     'quote_volume' => $k[7] ?? null,
-                    
+
                     'trades_count' => $k[8] ?? null,
-                    
+
                     'taker_buy_base_volume' => $k[9] ?? null,
                     'taker_buy_quote_volume' => $k[10] ?? null,
-                    
+
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
             }
-            
+
             Candle::upsert(
                 $batch,
                 [
@@ -123,11 +119,11 @@ class GetCandles extends Command
                     'updated_at'
                 ]
             );
-            
+
             $last = end($klines);
             $from = $last[0] + 1;
         }
-        
+
         $this->info("Done.");
     }
 }

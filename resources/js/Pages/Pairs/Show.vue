@@ -1,10 +1,10 @@
 <template>
   <Head :title="pair.symbol" />
-  
+
   <AppLayout :isLoading="isLoading">
-    
+
     <div class="p-6 space-y-4">
-      
+
       <!-- HEADER -->
       <div class="flex items-center">
         <div class="w-1/2">
@@ -12,12 +12,12 @@
             {{ pair.symbol }} - {{ pair.exchange.name }}
           </h1>
         </div>
-        
+
         <div class="w-1/2 flex justify-between items-center">
           <h1 class="w-2/3">
             {{ t('pair.last_updated') }} : {{ last_updated }}
           </h1>
-          
+
           <BaseSelect
             :options="time_options"
             label="pair.timeframe"
@@ -28,15 +28,15 @@
           />
         </div>
       </div>
-      
+
       <!-- CHART -->
       <div
         ref="chartContainer"
         class="w-full h-[500px] bg-white rounded-lg shadow"
       ></div>
-    
+
     </div>
-  
+
   </AppLayout>
 </template>
 
@@ -76,7 +76,7 @@ function initChart() {
     width: chartContainer.value.clientWidth,
     height: 500,
   })
-  
+
   candleSeries.value = chart.value.addCandlestickSeries({
     upColor: '#26a69a',
     downColor: '#ef5350',
@@ -88,7 +88,7 @@ function initChart() {
 
 async function loadCandles() {
   isLoading.value = true
-  
+
   const res = await axios.get(
     route('pairs.candles.get', props.pair.id),
     {
@@ -97,55 +97,66 @@ async function loadCandles() {
       }
     }
   )
-  
-  
-  
+
+
+
   const candles = formatCandles(res.data.candles)
-  
+
   candleSeries.value.setData(candles)
-  
+
   last_candle_time.value = candles.length
     ? candles[candles.length - 1].time
     : null
-  
+
   last_updated.value = new Date(res.data.last_updated * 1000).toLocaleString()
-  
+
   isLoading.value = false
 }
 
 setInterval(async() => {
   console.log('actualizando datos')
   if(!last_candle_time.value) return
-  
+
   const res = await axios.get(route('pairs.candles.getLive', props.pair.id), {
     params: {
       timeframe: timeframe.value,
     }
   })
-  
+
   const newCandles = res.data.candles
-  
+
+  // if(newCandles.length){
+  //   const candle = formatCandles(newCandles)[0]
+  //
+  //   console.log(candle)
+  //   console.log(last_candle_time.value)
+  //
+  //   if (candle.time === last_candle_time.value) {
+  //     console.log('actualizando ultima')
+  //     candleSeries.value.update(candle); // actualiza vela actual
+  //   } else {
+  //     console.log('se añade vela')
+  //     candleSeries.value.update(candle); // nueva vela
+  //     last_candle_time.value = candle.time;
+  //   }
+  //
+  // }
+
   if(newCandles.length){
-    const candle = formatCandles(newCandles)[0]
-    
-    console.log(candle)
-    console.log(last_candle_time.value)
-    
-    if (candle.time === last_candle_time.value) {
-      console.log('no se hace nada')
-      // candleSeries.value.update(c); // actualiza vela actual
-    } else {
-      console.log('se añade vela')
-      candleSeries.value.update(candle); // nueva vela
-      last_candle_time.value = candle.time;
-    }
-    
+    formatCandles(newCandles).forEach( (candle) => {
+      if(candle.time >= last_candle_time.value) {
+        candleSeries.value.update(candle);
+        if (candle.time != last_candle_time.value) {
+          last_candle_time.value = candle.time;
+        }
+      }
+    })
   }
-  
+
   if(res.data.last_updated){
     last_updated.value = new Date(res.data.last_updated * 1000).toLocaleString()
   }
-  
+
 }, 10000)
 
 const formatCandles = (candles) => {
