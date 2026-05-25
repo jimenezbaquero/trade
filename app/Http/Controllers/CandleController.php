@@ -18,9 +18,18 @@ class CandleController extends Controller
             $this->service->getCandles(
                 pair: $pair,
                 timeframe: $request->input('timeframe', '1m'),
-                limit: $request->input('limit', 200),
                 from: $request->input('from'),
                 to: $request->input('to'),
+            )
+        );
+    }
+    
+    public function getCandlesLive(Request $request, Pair $pair)
+    {
+        return response()->json(
+            $this->service->getCandlesLive(
+                pair: $pair,
+                timeframe: $request->input('timeframe', '1m'),
             )
         );
     }

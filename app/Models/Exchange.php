@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Exchange extends Model
 {
@@ -27,4 +28,22 @@ class Exchange extends Model
     {
         return $query->where('is_active', true);
     }
+    
+    public function pairs(): HasMany
+    {
+        return $this->hasMany(Pair::class);
+    }
+    
+    
+    public function getApiBaseUrl(bool $testnet = false): string
+    {
+        return $testnet ? $this->testnet_api_url : $this->api_url;
+    }
+    
+    public function getWebSocketUrl(bool $testnet = false): string
+    {
+        return $testnet ? $this->testnet_websocket_url : $this->websocket_url;
+    }
+    
+    
 }

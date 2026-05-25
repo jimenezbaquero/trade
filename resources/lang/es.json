@@ -50,6 +50,7 @@
 
 
   "pair.create_description": "Formulario para la creación de pares.",
+  "pair.last_updated": "Úlltima actualización",
   "pair.title": "Par",
   "pair.title_plural": "Pares",
   "pair.timeframe_placeholder": "Seleccione un tiempo de vida",

@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ExchangeSeeder::class,
             PairSeeder::class,
-            CandleSeeder::class
+//            CandleSeeder::class
             ]);
 
 

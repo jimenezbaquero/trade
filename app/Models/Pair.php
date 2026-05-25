@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pair extends Model
 {
@@ -55,6 +56,11 @@ class Pair extends Model
     public function exchange(): BelongsTo
     {
         return $this->belongsTo(Exchange::class);
+    }
+    
+    public function candles(): HasMany
+    {
+        return $this->hasMany(Candle::class);
     }
 
     /*

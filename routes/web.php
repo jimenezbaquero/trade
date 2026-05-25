@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('pairs', PairController::class);
     Route::post('pairs/getData', [PairController::class, 'getData'])->name('pairs.getData');
     Route::get('/pairs/{pair}/candles', [CandleController::class, 'getCandles'])->name('pairs.candles.get');
+    Route::get('/pairs/{pair}/candles-live', [CandleController::class, 'getCandlesLive'])->name('pairs.candles.getLive');
 });
 
 require __DIR__.'/auth.php';

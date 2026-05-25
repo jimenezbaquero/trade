@@ -24,6 +24,8 @@ return new class extends Migration
             // TIEMPO
             $table->timestamp('opened_at')->index();
             $table->timestamp('closed_at')->index()->nullable();
+            
+            $table->boolean('is_closed')->default(true)->index();
 
             $table->decimal('open', 20, 8);
             $table->decimal('high', 20, 8);
@@ -31,6 +33,12 @@ return new class extends Migration
             $table->decimal('close', 20, 8);
 
             $table->decimal('volume', 30, 12);
+            $table->decimal('quote_volume', 30, 12)->nullable();
+            
+            $table->unsignedInteger('trades_count')->nullable()->index();
+            
+            $table->decimal('taker_buy_base_volume', 30, 12)->nullable();
+            $table->decimal('taker_buy_quote_volume', 30, 12)->nullable();
 
             $table->timestamps();
 

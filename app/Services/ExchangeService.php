@@ -49,4 +49,6 @@ class ExchangeService
     public function destroy(Exchange $exchange){
         $exchange->delete();
     }
+    
+
 }
