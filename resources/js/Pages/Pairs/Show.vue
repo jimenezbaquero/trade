@@ -157,7 +157,7 @@ setInterval(async() => {
     last_updated.value = new Date(res.data.last_updated * 1000).toLocaleString()
   }
 
-}, 10000)
+}, 5000)
 
 const formatCandles = (candles) => {
   return candles.map(c => ({
