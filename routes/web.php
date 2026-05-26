@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CandleController;
 use App\Http\Controllers\ExchangeController;
+use App\Http\Controllers\IndicatorController;
 use App\Http\Controllers\PairController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -28,6 +29,9 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('exchanges', ExchangeController::class);
     Route::post('exchanges/getData', [ExchangeController::class, 'getData'])->name('exchanges.getData');
+    
+    Route::resource('indicators', IndicatorController::class);
+    Route::post('indicators/getData', [IndicatorController::class, 'getData'])->name('indicators.getData');
 
     Route::resource('pairs', PairController::class);
     Route::post('pairs/getData', [PairController::class, 'getData'])->name('pairs.getData');

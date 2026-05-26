@@ -28,6 +28,14 @@ import { Link } from '@inertiajs/vue3'
       >
         Pares
       </Link>
+      
+      <Link
+        href="/indicators"
+        class="block px-3 py-2 rounded hover:bg-gray-800"
+        :class="{ 'bg-gray-800': $page.url.startsWith('/indicators') }"
+      >
+        Indicadores
+      </Link>
     
     </nav>
   

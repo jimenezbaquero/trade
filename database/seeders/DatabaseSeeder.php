@@ -22,7 +22,8 @@ class DatabaseSeeder extends Seeder
             ExchangeSeeder::class,
             PairSeeder::class,
 //            CandleSeeder::class
-            ]);
+            IndicatorSeeder::class
+        ]);
 
 
 

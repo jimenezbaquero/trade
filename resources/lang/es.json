@@ -45,6 +45,38 @@
   "index.total_registers": "Total registros",
   "index.add_register": "Añadir registro",
 
+  "indicator.title": "Indicadores",
+  "indicator.create_description": "Crea y configura un nuevo indicador técnico para análisis de mercado.",
+
+  "indicator.fields.code": "Código",
+  "indicator.fields.name": "Nombre",
+  "indicator.fields.description": "Descripción",
+  "indicator.fields.handler": "Tipo de indicador",
+  "indicator.fields.config": "Configuración",
+
+  "indicator.fields.period": "Periodo",
+  "indicator.fields.source": "Fuente de datos",
+  "indicator.fields.fast": "Rápido (MACD)",
+  "indicator.fields.slow": "Lento (MACD)",
+  "indicator.fields.signal": "Señal (MACD)",
+
+  "indicator.actions.create": "Crear indicador",
+  "indicator.actions.update": "Actualizar indicador",
+  "indicator.actions.delete": "Eliminar indicador",
+
+  "indicator.messages.created_successfully": "Indicador creado correctamente",
+  "indicator.messages.created_error": "Error al crear el indicador",
+
+  "indicator.messages.updated_successfully": "Indicador actualizado correctamente",
+  "indicator.messages.updated_error": "Error al actualizar el indicador",
+
+  "indicator.messages.deleted_successfully": "Indicador eliminado correctamente",
+  "indicator.messages.deleted_error": "Error al eliminar el indicador",
+
+  "indicator.delete_title": "Eliminar indicador",
+  "indicator.delete_confirm": "¿Estás seguro de que quieres eliminar este indicador? Esta acción no se puede deshacer.",
+
+
   "order.asc": "Ascendente",
   "order.desc": "Descendente",
 
