@@ -37,102 +37,110 @@ class GetCandles extends Command {
                 '15m',
                 '1h'
             ];
-        } else {
-            $intervals = [$interval];
         }
 
         $client = $exchangeManager->make($exchange);
 
-        foreach ($intervals as $interval) {
-
-
-            if (!$fromOption) {
-                $lastCandle = $pair->candles()->where('timeframe', $interval)->latest('opened_at')->first();
-                if ($lastCandle) {
-                    $from = $lastCandle->opened_at
-                        ->subMinute()
-                        ->getTimestampMs();
-                } else {
-                    $from = now()
-                        ->subDay()
-                        ->getTimestampMs();
+        if($interval != 'live') {
+            $this->updateCandles($client, $pair, $symbol, $interval, $fromOption, $to);
+        }else {
+            while (true) {
+                $to = now()->getTimestampMs();
+                foreach ($intervals as $interval) {
+                    $this->updateCandles($client, $pair, $symbol, $interval, $fromOption, $to);
                 }
-            } else {
-                $from = strtotime($this->argument('from')) * 1000;
-            }
-
-            while ($from <= $to) {
-                $klines = $client->klines(
-                    $symbol,
-                    $interval,
-                    $from,
-                    $to,
-                    1000
-                );
-
-                if (empty($klines)) {
-                    break;
-                }
-
-                $batch = [];
-                $numberKlines = count($klines);
-
-                foreach ($klines as $index => $k) {
-                    $isLast = $index === $numberKlines - 1;
-
-                    $batch[] = [
-                        'pair_id' => $pair->id,
-                        'timeframe' => $interval,
-
-                        'opened_at' => date('Y-m-d H:i:s', $k[0] / 1000),
-                        'closed_at' => date('Y-m-d H:i:s', $k[6] / 1000),
-                        'is_closed' => !$isLast,
-
-                        'open' => $k[1],
-                        'high' => $k[2],
-                        'low' => $k[3],
-                        'close' => $k[4],
-
-                        'volume' => $k[5],
-                        'quote_volume' => $k[7] ?? null,
-
-                        'trades_count' => $k[8] ?? null,
-
-                        'taker_buy_base_volume' => $k[9] ?? null,
-                        'taker_buy_quote_volume' => $k[10] ?? null,
-
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                }
-
-                Candle::upsert(
-                    $batch,
-                    [
-                        'pair_id',
-                        'timeframe',
-                        'opened_at'
-                    ],
-                    [
-                        'closed_at',
-                        'is_closed',
-                        'open',
-                        'high',
-                        'low',
-                        'close',
-                        'volume',
-                        'quote_volume',
-                        'trades_count',
-                        'taker_buy_base_volume',
-                        'taker_buy_quote_volume',
-                        'updated_at'
-                    ]
-                );
-
-                $last = end($klines);
-                $from = $last[0] + 1;
+                sleep(2);
             }
         }
         $this->info("Done.");
+    }
+
+    public function updateCandles($client, Pair $pair, string $symbol, string $interval, $fromOption, $to) {
+        if (!$fromOption) {
+            $lastCandle = $pair->candles()->where('timeframe', $interval)->latest('opened_at')->first();
+            if ($lastCandle) {
+                $from = $lastCandle->opened_at
+                    ->subMinute()
+                    ->getTimestampMs();
+            } else {
+                $from = now()
+                    ->subDay()
+                    ->getTimestampMs();
+            }
+        } else {
+            $from = strtotime($fromOption) * 1000;
+        }
+
+        while ($from <= $to) {
+            $klines = $client->klines(
+                $symbol,
+                $interval,
+                $from,
+                $to,
+                1000
+            );
+
+            if (empty($klines)) {
+                break;
+            }
+
+            $batch = [];
+            $numberKlines = count($klines);
+
+            foreach ($klines as $index => $k) {
+                $isLast = $index === $numberKlines - 1;
+
+                $batch[] = [
+                    'pair_id' => $pair->id,
+                    'timeframe' => $interval,
+
+                    'opened_at' => date('Y-m-d H:i:s', $k[0] / 1000),
+                    'closed_at' => date('Y-m-d H:i:s', $k[6] / 1000),
+                    'is_closed' => !$isLast,
+
+                    'open' => $k[1],
+                    'high' => $k[2],
+                    'low' => $k[3],
+                    'close' => $k[4],
+
+                    'volume' => $k[5],
+                    'quote_volume' => $k[7] ?? null,
+
+                    'trades_count' => $k[8] ?? null,
+
+                    'taker_buy_base_volume' => $k[9] ?? null,
+                    'taker_buy_quote_volume' => $k[10] ?? null,
+
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            Candle::upsert(
+                $batch,
+                [
+                    'pair_id',
+                    'timeframe',
+                    'opened_at'
+                ],
+                [
+                    'closed_at',
+                    'is_closed',
+                    'open',
+                    'high',
+                    'low',
+                    'close',
+                    'volume',
+                    'quote_volume',
+                    'trades_count',
+                    'taker_buy_base_volume',
+                    'taker_buy_quote_volume',
+                    'updated_at'
+                ]
+            );
+
+            $last = end($klines);
+            $from = $last[0] + 1;
+        }
     }
 }

@@ -1,10 +1,10 @@
 <template>
   <Head :title="t('indicator.actions.update')" />
-  
+
   <AppLayout :isLoading="isLoading">
-    
-    <div class="p-6">
-      
+
+    <div class="max-w-4xl mx-auto">
+
       <Form
         :form="form"
         :title="t('indicator.actions.update')"
@@ -12,9 +12,9 @@
         @cancel="onCancel"
         @save="onSave"
       />
-    
+
     </div>
-  
+
   </AppLayout>
 </template>
 
@@ -45,12 +45,12 @@ const form = ref({
   name: props.indicator.name ?? '',
   description: props.indicator.description ?? '',
   handler: props.indicator.handler ?? '',
-  
+
   // IMPORTANTE: stringify para textarea JSON
   config: props.indicator.config
     ? JSON.stringify(props.indicator.config, null, 2)
     : '{}',
-  
+
   errors: {},
 })
 
@@ -69,28 +69,28 @@ const handlers = [
  * SAVE
  */
 async function onSave() {
-  
+
   isLoading.value = true
-  
+
   try {
-    
+
     const response = await axios.put(
       route('indicators.update', props.indicator.id),
       form.value
     )
-    
+
     toast.success(t('indicator.messages.updated_successfully'))
-    
+
     router.visit(route('indicators.index'))
-    
+
   } catch (error) {
-    
+
     if (error.response?.data?.errors) {
       form.value.errors = error.response.data.errors
     }
-    
+
     toast.error(t('indicator.messages.updated_error'))
-    
+
   } finally {
     isLoading.value = false
   }
