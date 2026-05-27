@@ -122,7 +122,7 @@ class CandleService
             $to
         ) {
             $candles = $this->queryCandles($pair, $timeframe, $from, $to, true);
-            $lastUpdated = $candles->last()?->opened_at?->timestamp;
+            $lastUpdated = $candles->first()?->opened_at?->timestamp;
 
             $aux = $candles[0];
             $candles[0] = $candles[1];
