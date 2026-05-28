@@ -30,6 +30,7 @@ class CandleService
             }
 
         return $query->get([
+                'id',
                 'opened_at',
                 'open',
                 'high',
@@ -40,40 +41,41 @@ class CandleService
     }
 
     private function buildCacheKey(
-        int $pairId,
-        string $timeframe,
-        ?string $from,
-        ?string $to
-    ): string {
-        return "candles:{$pairId}:{$timeframe}:{$from}:{$to}";
-    }
+            int $pairId,
+            string $timeframe,
+            ?string $from,
+            ?string $to
+        ): string {
+            return "candles:{$pairId}:{$timeframe}:{$from}:{$to}";
+        }
 
     public function getCandles(
-        Pair $pair,
-        string $timeframe = '1m',
-        ?string $from = null,
-        ?string $to = null
-    ) {
-         if(!$from){
-             $from = Carbon::now()->subDays(2);
-         }
-
-        $cacheKey = $this->buildCacheKey($pair->id, $timeframe, $from, $to);
-
-        return Cache::tags([
-            "candles",
-            "pair:{$pair->id}:{$timeframe}"
-        ])->remember($cacheKey, now()->addSeconds(30), function () use (
-            $pair,
-            $timeframe,
-            $from,
-            $to
+            Pair $pair,
+            string $timeframe = '1m',
+            ?string $from = null,
+            ?string $to = null
         ) {
-            $candles = $this->queryCandles($pair, $timeframe, $from, $to);
+            if(!$from){
+                $from = Carbon::now()->subDays(2);
+            }
+            
+            $cacheKey = $this->buildCacheKey($pair->id, $timeframe, $from, $to);
+            
+            return Cache::tags([
+                "candles",
+                "pair:{$pair->id}:{$timeframe}"
+            ])->remember($cacheKey, now()->addSeconds(30), function () use (
+                $pair,
+                $timeframe,
+                $from,
+                $to
+            ) {
+                $candles = $this->queryCandles($pair, $timeframe, $from, $to);
 
             $lastUpdated = $candles->last()?->opened_at?->timestamp;
 
             $candles = $candles->map(fn ($c) => [
+                'id' => $c->id,
                 'open' => $c->open,
                 'high' => $c->high,
                 'low' => $c->low,
@@ -129,6 +131,7 @@ class CandleService
             $candles[1] = $aux;
 
             $candles = $candles->map(fn ($c) => [
+                'id' => $c->id,
                 'open' => $c->open,
                 'high' => $c->high,
                 'low' => $c->low,

@@ -3,6 +3,7 @@
 use App\Http\Controllers\CandleController;
 use App\Http\Controllers\ExchangeController;
 use App\Http\Controllers\IndicatorController;
+use App\Http\Controllers\IndicatorValueController;
 use App\Http\Controllers\PairController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -37,6 +38,8 @@ Route::middleware('auth')->group(function () {
     Route::post('pairs/getData', [PairController::class, 'getData'])->name('pairs.getData');
     Route::get('/pairs/{pair}/candles', [CandleController::class, 'getCandles'])->name('pairs.candles.get');
     Route::get('/pairs/{pair}/candles-live', [CandleController::class, 'getCandlesLive'])->name('pairs.candles.getLive');
+    
+    Route::get('/indicatorValues/{indicator}/getValues', [IndicatorValueController::class, 'getIndicatorValues'])->name('indicatorValues.get');
 });
 
 require __DIR__.'/auth.php';

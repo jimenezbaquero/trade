@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\FunnelHelper;
 use App\Http\Requests\PairRequest;
 use App\Models\Exchange;
+use App\Models\Indicator;
 use App\Models\Pair;
 use App\Presenters\PairPresenter;
 use App\Services\PairService;
@@ -77,7 +78,7 @@ class PairController extends Controller
     {
         return Inertia::render('Pairs/Show', [
             'pair' => $pair->load('exchange'),
-            'last_updated' => $pair->candles()->latest('opened_at')->first()->opened_at,
+            'indicators' => Indicator::all(),
             'time_options' => [
                 ['value' => '1m', 'label' => '1m'],
                 ['value' => '5m', 'label' => '5m'],
