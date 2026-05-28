@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/pairs/{pair}/candles-live', [CandleController::class, 'getCandlesLive'])->name('pairs.candles.getLive');
     
     Route::get('/indicatorValues/{indicator}/getValues', [IndicatorValueController::class, 'getIndicatorValues'])->name('indicatorValues.get');
+    Route::get('/indicatorValues/{indicator}/getValuesLive', [IndicatorValueController::class, 'getIndicatorValuesLive'])->name('indicatorValues.getLive');
 });
 
 require __DIR__.'/auth.php';

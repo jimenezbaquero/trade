@@ -88,13 +88,18 @@ const chartContainer = ref(null)
 const chart = ref(null)
 const candleSeries = ref(null)
 const historicFirstCandle = ref(null)
-const lastCandleIndicatorValue = ref({})
+
+const lastFromCandleIndicatorValue = ref({})
+const lastToCandleIndicatorValue = ref({})
 
 const indicatorValueSeries = ref({})
 const indicatorSelects = ref([])
 
 const timeframe = ref('1m')
 const isLoading = ref(false)
+
+let isRunning = false;
+let started = false;
 
 function isSelected(indicator) {
   return indicatorSelects.value.some(i => i.id === indicator.id)
@@ -104,26 +109,15 @@ async function toggleIndicator(indicator, checked) {
   console.log(indicator)
 
   if (checked) {
-
     indicatorSelects.value.push(indicator)
-
-    // evitar duplicados
-    if (!indicatorValueSeries.value[indicator.id]) {
-
-      console.log('indicador antes de inicializar')
-      await initIndicatorValues(indicator.id)
-      await loadIndicatorValues(indicator.id)
-    }
-
+    await initIndicatorValues(indicator.id)
+    await loadIndicatorValues(indicator.id)
   }else {
-
-    indicatorSelects.value =
-      indicatorSelects.value.filter(i => i.id !== indicator.id)
-
-    if (indicatorValueSeries.value[indicator.id]) {
-      chart.value.removeSeries(indicatorValueSeries.value[indicator.id])
-      delete indicatorValueSeries.value[indicator.id]
-    }
+    indicatorSelects.value = indicatorSelects.value.filter(i => i.id !== indicator.id)
+    chart.value.removeSeries(indicatorValueSeries.value[indicator.id])
+    delete indicatorValueSeries.value[indicator.id]
+    delete lastFromCandleIndicatorValue.value[indicator.id]
+    delete lastToCandleIndicatorValue.value[indicator.id]
   }
 }
 
@@ -181,12 +175,6 @@ async function loadIndicatorValues(indicator, live) {
   let from = historicFirstCandle.value
   let to = last_candle_id.value
   
-  if(indicatorValueSeries.value[indicator]){
-    if(lastCandleIndicatorValue.value[indicator]){
-      from = lastCandleIndicatorValue.value[indicator]
-    }
-  }
-  
   console.log(indicator, from, to)
   const res = await axios.get(
     route('indicatorValues.get', indicator),
@@ -206,7 +194,8 @@ async function loadIndicatorValues(indicator, live) {
   
   if(values.length){
     console.log(values[values.length - 1].candle_id)
-    lastCandleIndicatorValue.value[indicator] = values[values.length - 1].candle_id
+    lastToCandleIndicatorValue.value[indicator] = values[values.length - 1].candle_id
+    lastFromCandleIndicatorValue.value[indicator] = values[0].candle_id
   }
   
   isLoading.value = false
@@ -226,67 +215,92 @@ async function initIndicatorValues(indicator) {
   
 }
 
-setInterval(async() => {
-  console.log('actualizando datos')
-  update_time.value = new Date().toLocaleString()
-  if(!last_candle_time.value) return
-  
-  const resCandles = await axios.get(route('pairs.candles.getLive', props.pair.id), {
-    params: {
-      timeframe: timeframe.value,
-    }
-  })
-  
-  const newCandles = resCandles.data.candles
-  const formatedCandles = formatCandles(newCandles)
-  
-  if(newCandles.length){
+
+async function loop() {
+  if (isRunning) return;
+  isRunning = true
+  await runSync();
+  isRunning =false
+  setTimeout(loop, 2000);
+}
+
+async function runSync() {
+  try {
+    console.log('actualizando datos');
     
-    formatedCandles.forEach((candle) => {
-      if(candle.time >= last_candle_time.value){
-        candleSeries.value.update(candle);
-        if(candle.time !== last_candle_time.value){
-          last_candle_time.value = candle.time;
-          last_candle_id.value = candle.id
+    update_time.value = new Date().toLocaleString();
+    
+    if (!last_candle_time.value) return;
+    
+    // -------------------------
+    // 1. CANDLES
+    // -------------------------
+    const resCandles = await axios.get(
+      route('pairs.candles.getLive', props.pair.id),
+      {
+        params: {
+          timeframe: timeframe.value,
         }
       }
-    })
-  }
-  
-  await indicatorSelects.value.forEach((indicator) => {
-    console.log('viendo si hay que cargar datos para indicador '+indicator.id)
-    if(indicatorValueSeries.value[indicator.id]){
-      let from = historicFirstCandle.value
-      let to = last_candle_id.value
-      
-      if(indicatorValueSeries.value[indicator.id]){
-        if(lastCandleIndicatorValue.value[indicator.id]){
-          from = lastCandleIndicatorValue.value[indicator.id]
-        }
-      }
-      
-      const res = axios.get(
-        route('indicatorValues.get', indicator),
-        {
-          params: {
-            from:from,
-            to:to
+    );
+    
+    const newCandles = resCandles.data.candles || [];
+    const formatedCandles = formatCandles(newCandles);
+    
+    if (formatedCandles.length) {
+      for (const candle of formatedCandles) {
+        if (candle.time >= last_candle_time.value) {
+          candleSeries.value.update(candle);
+          
+          if (candle.time !== last_candle_time.value) {
+            last_candle_time.value = candle.time;
+            last_candle_id.value = candle.id;
           }
         }
-      )
-      
-      const values = res.data.values
-      
-      const formatedValues = formatIndicatorValues(values)
-      
-      formatedValues.forEach((value) => {
-        indicatorValueSeries.value[indicator.id].update(value)
-      })
+      }
     }
-  })
-  
-  
-}, 2000)
+    
+    // -------------------------
+    // 2. INDICATORS
+    // -------------------------
+    console.log(indicatorSelects.value);
+    
+    for (const indicator of indicatorSelects.value) {
+      
+      console.log('viendo indicador ' + indicator.id);
+      
+      if (!indicatorValueSeries.value[indicator.id] || !lastToCandleIndicatorValue.value[indicator.id]) continue;
+      
+      const res = await axios.get(
+        route('indicatorValues.getLive', indicator.id),
+        {
+          params: {
+            timeframe: timeframe.value,
+          }
+        }
+      );
+      
+      const values = res.data.values || [];
+      
+      const formatedValues = formatIndicatorValues(values);
+
+      for (const value of formatedValues) {
+        console.log('id de vela a revisar'+value.candle_id)
+        console.log('ultima vela introducidar'+lastToCandleIndicatorValue.value[indicator.id])
+        if (value.candle_id >= lastToCandleIndicatorValue.value[indicator.id]){
+          console.log('añadiendo trozo de grafica')
+          indicatorValueSeries.value[indicator.id].update(value);
+          if(value.candle_id > lastToCandleIndicatorValue.value[indicator.id]){
+            lastToCandleIndicatorValue.value[indicator.id] = value.candle_id
+          }
+        }
+      }
+    }
+    
+  } catch (err) {
+    console.error('sync error:', err);
+  }
+}
 
 const formatCandles = (candles) => {
   return candles.map(c => ({
@@ -300,8 +314,8 @@ const formatCandles = (candles) => {
 }
 
 const formatIndicatorValues = (values) => {
-  console.log(values)
   return values.map(v => ({
+    candle_id: Number(v.candle_id),
     time: Number(v.time),
     value: typeof v.value === 'object'
       ? Number(v.value.value)
@@ -323,5 +337,6 @@ const getColor = ((id) => {
 onMounted(async() => {
   initChart()
   await loadCandles()
+  loop();
 })
 </script>

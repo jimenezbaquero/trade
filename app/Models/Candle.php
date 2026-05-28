@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Candle extends Model
 {
@@ -51,9 +52,15 @@ class Candle extends Model
         'trades_count' => 'integer',
     ];
     
+   
     public function pair(): BelongsTo
     {
         return $this->belongsTo(Pair::class);
+    }
+    
+    public function indicatorValues(): HasMany
+    {
+        return $this->hasMany(IndicatorValue::class);
     }
 }
 

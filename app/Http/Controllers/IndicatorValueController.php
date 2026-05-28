@@ -25,4 +25,14 @@ class IndicatorValueController extends Controller
         );
     }
     
+    public function getIndicatorValuesLive(Indicator $indicator, Request $request)
+    {
+        return response()->json(
+            $this->service->getIndicatorValuesLive(
+                indicator: $indicator,
+                timeframe: $request->input('timeframe')
+            )
+        );
+    }
+    
 }

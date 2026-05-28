@@ -8,7 +8,7 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 use App\Events\CandleCreated;
 
 // LISTENERS
-use App\Listeners\HandleCandleCreated;
+use App\Listeners\HandleCandleChanged;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -19,7 +19,7 @@ class EventServiceProvider extends ServiceProvider
 
         // CANDLE EVENTS
         CandleCreated::class => [
-            HandleCandleCreated::class,
+            HandleCandleChanged::class,
         ],
 
     ];

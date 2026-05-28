@@ -2,16 +2,16 @@
 
 namespace App\Console\Commands;
 
+use App\Events\CandleChanged;
 use App\Managers\ExchangeManager;
 use App\Models\Candle;
 use App\Models\Exchange;
 use App\Models\Pair;
-use Carbon\Carbon;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
-#[Signature('candles:get {exchange} {symbol} {interval} {--from} {--to=}')]
+#[Signature('candles:get {exchange} {symbol} {interval} {--from=} {--to=}')]
 #[Description('Command to get candles from an exchange')]
 class GetCandles extends Command {
     /**
@@ -29,7 +29,8 @@ class GetCandles extends Command {
         $to = $this->option('to') ? strtotime($this->option('to')) * 1000 : now()->getTimestampMs();
 
         $pair = $exchange->pairs()->where('symbol', $symbol)->firstOrFail();
-
+        $live = $interval == 'live';
+        
         if ($interval == 'live') {
             $intervals = [
                 '1m',
@@ -41,13 +42,13 @@ class GetCandles extends Command {
 
         $client = $exchangeManager->make($exchange);
 
-        if($interval != 'live') {
-            $this->updateCandles($client, $pair, $symbol, $interval, $fromOption, $to);
+        if(!$live) {
+            $this->updateCandles($client, $live, $pair, $symbol, $interval, $fromOption, $to);
         }else {
             while (true) {
                 $to = now()->getTimestampMs();
                 foreach ($intervals as $interval) {
-                    $this->updateCandles($client, $pair, $symbol, $interval, $fromOption, $to);
+                    $this->updateCandles($client, $live, $pair, $symbol, $interval, $fromOption, $to);
                 }
                 sleep(2);
             }
@@ -55,7 +56,7 @@ class GetCandles extends Command {
         $this->info("Done.");
     }
 
-    public function updateCandles($client, Pair $pair, string $symbol, string $interval, $fromOption, $to) {
+    public function updateCandles($client, $live, Pair $pair, string $symbol, string $interval, $fromOption, $to) {
         if (!$fromOption) {
             $lastCandle = $pair->candles()->where('timeframe', $interval)->latest('opened_at')->first();
             if ($lastCandle) {
@@ -86,7 +87,7 @@ class GetCandles extends Command {
 
             $batch = [];
             $numberKlines = count($klines);
-
+            
             foreach ($klines as $index => $k) {
                 $isLast = $index === $numberKlines - 1;
 
@@ -116,28 +117,67 @@ class GetCandles extends Command {
                 ];
             }
 
-            Candle::upsert(
-                $batch,
-                [
-                    'pair_id',
-                    'timeframe',
-                    'opened_at'
-                ],
-                [
-                    'closed_at',
-                    'is_closed',
-                    'open',
-                    'high',
-                    'low',
-                    'close',
-                    'volume',
-                    'quote_volume',
-                    'trades_count',
-                    'taker_buy_base_volume',
-                    'taker_buy_quote_volume',
-                    'updated_at'
-                ]
-            );
+            
+            if(!$live) {
+                Candle::upsert(
+                    $batch,
+                    [
+                        'pair_id',
+                        'timeframe',
+                        'opened_at'
+                    ],
+                    [
+                        'closed_at',
+                        'is_closed',
+                        'open',
+                        'high',
+                        'low',
+                        'close',
+                        'volume',
+                        'quote_volume',
+                        'trades_count',
+                        'taker_buy_base_volume',
+                        'taker_buy_quote_volume',
+                        'updated_at'
+                    ]
+                );
+            }else{
+                foreach ($batch as $data){
+                    $candle = Candle::updateOrCreate(
+                        [
+                            'pair_id' => $data['pair_id'],
+                            'timeframe' => $data['timeframe'],
+                            'opened_at' => $data['opened_at'],
+                        ],
+                        [
+                            'closed_at' => $data['closed_at'],
+                            'is_closed' => $data['is_closed'],
+                            'open' => $data['open'],
+                            'high' => $data['high'],
+                            'low' => $data['low'],
+                            'close' => $data['close'],
+                            'volume' => $data['volume'],
+                            'quote_volume' => $data['quote_volume'],
+                            'trades_count' => $data['trades_count'],
+                            'taker_buy_base_volume' => $data['taker_buy_base_volume'],
+                            'taker_buy_quote_volume' => $data['taker_buy_quote_volume'],
+                        ]
+                    );
+                    
+                    $dirty = $candle->wasRecentlyCreated || $candle->wasChanged([
+                            'open',
+                            'high',
+                            'low',
+                            'close',
+                            'volume'
+                        ]);
+                    
+                    if ($dirty) {
+                        event (new CandleChanged($candle->id));
+                    }
+                }
+            }
+            
 
             $last = end($klines);
             $from = $last[0] + 1;
