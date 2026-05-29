@@ -106,7 +106,6 @@ function isSelected(indicator) {
 }
 
 async function toggleIndicator(indicator, checked) {
-  console.log(indicator)
 
   if (checked) {
     indicatorSelects.value.push(indicator)
@@ -175,7 +174,6 @@ async function loadIndicatorValues(indicator, live) {
   let from = historicFirstCandle.value
   let to = last_candle_id.value
   
-  console.log(indicator, from, to)
   const res = await axios.get(
     route('indicatorValues.get', indicator),
     {
@@ -193,7 +191,6 @@ async function loadIndicatorValues(indicator, live) {
   indicatorValueSeries.value[indicator].setData(formatedValues)
   
   if(values.length){
-    console.log(values[values.length - 1].candle_id)
     lastToCandleIndicatorValue.value[indicator] = values[values.length - 1].candle_id
     lastFromCandleIndicatorValue.value[indicator] = values[0].candle_id
   }
@@ -211,7 +208,6 @@ async function initIndicatorValues(indicator) {
         lineWidth: 2,
       })
   }
-  console.log('serie creada para indicador '+indicator)
   
 }
 
@@ -221,12 +217,11 @@ async function loop() {
   isRunning = true
   await runSync();
   isRunning =false
-  setTimeout(loop, 2000);
+  setTimeout(loop, 1000);
 }
 
 async function runSync() {
   try {
-    console.log('actualizando datos');
     
     update_time.value = new Date().toLocaleString();
     
@@ -263,11 +258,9 @@ async function runSync() {
     // -------------------------
     // 2. INDICATORS
     // -------------------------
-    console.log(indicatorSelects.value);
     
     for (const indicator of indicatorSelects.value) {
       
-      console.log('viendo indicador ' + indicator.id);
       
       if (!indicatorValueSeries.value[indicator.id] || !lastToCandleIndicatorValue.value[indicator.id]) continue;
       
@@ -285,10 +278,7 @@ async function runSync() {
       const formatedValues = formatIndicatorValues(values);
 
       for (const value of formatedValues) {
-        console.log('id de vela a revisar'+value.candle_id)
-        console.log('ultima vela introducidar'+lastToCandleIndicatorValue.value[indicator.id])
         if (value.candle_id >= lastToCandleIndicatorValue.value[indicator.id]){
-          console.log('añadiendo trozo de grafica')
           indicatorValueSeries.value[indicator.id].update(value);
           if(value.candle_id > lastToCandleIndicatorValue.value[indicator.id]){
             lastToCandleIndicatorValue.value[indicator.id] = value.candle_id
@@ -325,8 +315,8 @@ const formatIndicatorValues = (values) => {
 
 const getColor = ((id) => {
   const colors = {
-    '1': '#451263',
-    '2': '#120F12',
+    '1': '#05EF63',
+    '2': '#A91F92',
     '3': '#220012',
     '4': '#920F12'
   }

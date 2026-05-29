@@ -3,10 +3,9 @@
 namespace App\Services;
 
 use App\Calculators\EmaCalculator;
+use App\Calculators\RsiCalculator;
 use App\Models\Indicator;
 use App\Models\Candle;
-use App\Models\IndicatorValue;
-use Illuminate\Support\Facades\Log;
 
 class IndicatorCalculatorService
 {
@@ -24,13 +23,28 @@ class IndicatorCalculatorService
                     $this->getPreviousValue($indicator_id, $candle),
                     20
                 );
+            case 'ema_50':
+                return EmaCalculator::calculate(
+                    $candle->close,
+                    $this->getPreviousValue($indicator_id, $candle),
+                    50
+                );
+            case 'rsi_14':
+                return RsiCalculator::calculate(
+                    $this->getLastCandles(15, $candle),
+                    14
+                );
             default:
                 throw new \Exception('Indicator not supported');
         }
     }
     
     private function getPreviousValue(int $indicatorId, Candle $candle){
-        $prevCandle = Candle::where('timeframe', $candle->timeframe)->where('opened_at','<', $candle->opened_at)->orderBy('opened_at','desc')->first();
+        $prevCandle = Candle::where('timeframe', $candle->timeframe)
+            ->where('pair_id', $candle->pair_id)
+            ->where('opened_at','<', $candle->opened_at)
+            ->orderBy('opened_at','desc')
+            ->first();
         if(!$prevCandle){
             return null;
         }
@@ -40,6 +54,19 @@ class IndicatorCalculatorService
         }
         
         return $indicatorValue->value['value'];
-
+    }
+    
+    private function getLastCandles(int $account, Candle $candle){
+        $candles = Candle::query()
+            ->where('pair_id', $candle->pair_id)
+            ->where('timeframe', $candle->timeframe)
+            ->where('opened_at', '<=', $candle->opened_at)
+            ->orderBy('opened_at', 'desc')
+            ->take($account)
+            ->get()
+            ->reverse()
+            ->values();
+        
+        return $candles->pluck('close')->map(fn ($v) => (float) $v)->toArray();
     }
 }

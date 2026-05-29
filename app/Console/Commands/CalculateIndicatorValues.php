@@ -11,7 +11,7 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
-#[Signature('indicatorValues:calculate')]
+#[Signature('indicatorValues:calculate {--indicator=} {--truncate=}' )]
 #[Description('Command description')]
 class CalculateIndicatorValues extends Command
 {
@@ -26,8 +26,19 @@ class CalculateIndicatorValues extends Command
      */
     public function handle()
     {
-        //
-        DB::table('indicator_values')->truncate();
+        $truncate = $this->option('truncate') == 'yes';
+        if($truncate) {
+            DB::table('indicator_values')->truncate();
+        }
+        
+        if(!is_null($this->option('indicator'))){
+            $indicator = Indicator::where('code',$this->option('indicator'))->first();
+            if(!is_null($indicator)){
+                $indicators = [$indicator];
+            }
+        }else{
+            $indicators = Indicator::all();
+        }
         
         $timeframes = ['1m', '5m', '15m', '1h'];
         
@@ -44,8 +55,8 @@ class CalculateIndicatorValues extends Command
             }
             
             foreach ($candles as $candle) {
-                foreach (Indicator::all() as $indicator) {
-                    $this->info('Calculando valores para indicador '.$indicator->id);
+                foreach ($indicators as $indicator) {
+                    $this->info('Calculando valores para indicador '.$indicator->code);
                     try {
                         $value = $this->service->calculate($indicator->id, $candle->id);
                         
