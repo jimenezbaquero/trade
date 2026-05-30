@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Calculators\EmaCalculator;
+use App\Calculators\RsiCalculator;
 use App\Models\Candle;
 use App\Models\Indicator;
 use App\Models\IndicatorValue;
@@ -30,52 +32,110 @@ class CalculateIndicatorValues extends Command
         if($truncate) {
             DB::table('indicator_values')->truncate();
         }
-        
+
         if(!is_null($this->option('indicator'))){
             $indicator = Indicator::where('code',$this->option('indicator'))->first();
             if(!is_null($indicator)){
                 $indicators = [$indicator];
             }
         }else{
-            $indicators = Indicator::all();
+            $indicators = Indicator::where('id','<',4)->get();
         }
-        
+
         $timeframes = ['1m', '5m', '15m', '1h'];
-        
+
 
         foreach ($timeframes as $timeframe) {
-            $this->info('Procesando time '.$timeframe);
-            $candles = Candle::query()
+
+            $this->info("Procesando time {$timeframe}");
+
+            $candles = DB::table('candles')
+                ->select('id', 'close')
                 ->where('timeframe', $timeframe)
                 ->orderBy('opened_at')
                 ->get();
-            
+
             if ($candles->isEmpty()) {
                 continue;
             }
-            
-            foreach ($candles as $candle) {
-                foreach ($indicators as $indicator) {
-                    $this->info('Calculando valores para indicador '.$indicator->code);
-                    try {
-                        $value = $this->service->calculate($indicator->id, $candle->id);
-                        
-                        IndicatorValue::updateOrCreate(
-                            [
-                                'indicator_id' => $indicator->id,
-                                'candle_id' => $candle->id,
-                            ],
-                            [
-                                'value' => $value,
-                            ]
+
+            foreach ($indicators as $indicator) {
+
+                $rows = [];
+                $nRows = 0;
+
+                $emaState = null;
+                $rsiWindow = [];
+
+                foreach ($candles as $candle) {
+
+                    $nRows++;
+
+                    switch ($indicator->code) {
+
+                        case 'ema_20':
+                            $emaState = EmaCalculator::calculate(
+                                $candle->close,
+                                $emaState['value']??null,
+                                20
+                            );
+
+                            $value = $emaState;
+                            break;
+
+                        case 'ema_50':
+                            $emaState = EmaCalculator::calculate(
+                                $candle->close,
+                                $emaState['value']??null,
+                                50
+                            );
+
+                            $value = $emaState;
+                            break;
+
+                        case 'rsi_14':
+
+                            $rsiWindow[] = $candle->close;
+
+                            if (count($rsiWindow) > 15) {
+                                array_shift($rsiWindow);
+                            }
+
+                            $value = RsiCalculator::calculate($rsiWindow, 14);
+                            break;
+
+                        default:
+                            $value = null;
+                    }
+
+                    $rows[] = [
+                        'indicator_id' => $indicator->id,
+                        'candle_id' => $candle->id,
+                        'value' => json_encode($value),
+                    ];
+
+                    if (count($rows) >= 2000) {
+
+                        $this->info("Guardando. Registros: {$nRows}");
+
+                        IndicatorValue::upsert(
+                            $rows,
+                            ['indicator_id', 'candle_id'],
+                            ['value']
                         );
-                    } catch (\Throwable $e) {
-                    
+
+                        $rows = [];
                     }
                 }
+
+                if (!empty($rows)) {
+                    IndicatorValue::upsert(
+                        $rows,
+                        ['indicator_id', 'candle_id'],
+                        ['value']
+                    );
+                }
             }
-            
-            
         }
         $this->info('Done.');
     }

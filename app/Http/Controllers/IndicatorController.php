@@ -15,14 +15,14 @@ class IndicatorController extends Controller
     public function __construct(
         private IndicatorService $service
     ) {}
-    
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
         $filters = $this->getFilters($request);
-        
+
         return Inertia::render('Indicators/Index', [
             'indicators' => $this->service->getData($request->all()),
             'filters' => $filters,
@@ -30,7 +30,7 @@ class IndicatorController extends Controller
             'actions' => ['update', 'delete'],
         ]);
     }
-    
+
     /**
      * Show the form for creating a new resource.
      */
@@ -38,34 +38,34 @@ class IndicatorController extends Controller
     {
         return Inertia::render('Indicators/Create');
     }
-    
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(IndicatorRequest $request)
     {
         try {
-            
+
             $data = $request->validated();
-            
+
             $this->service->store($data);
-            
+
             return to_route('indicators.index')
                 ->with('success', __('indicator.messages.created_successfully'));
-            
+
         } catch (\Throwable $e) {
-            
+
             Log::error('Indicator store failed', [
                 'message' => $e->getMessage(),
                 'data' => $data ?? [],
             ]);
-            
+
             return to_route('indicators.create')
                 ->withInput()
                 ->with('error', __('indicator.messages.created_error'));
         }
     }
-    
+
     /**
      * Display the specified resource.
      */
@@ -75,7 +75,7 @@ class IndicatorController extends Controller
             'indicator' => $indicator,
         ]);
     }
-    
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -85,62 +85,66 @@ class IndicatorController extends Controller
             'indicator' => $indicator,
         ]);
     }
-    
+
     /**
      * Update the specified resource in storage.
      */
     public function update(IndicatorRequest $request, Indicator $indicator)
     {
         try {
-            
+
             $data = $request->validated();
-            
+
             $this->service->update($data, $indicator);
-            
-            return to_route('indicators.index')
+
+            return redirect()
+                ->route('indicators.index')
+                ->setStatusCode(303)
                 ->with('success', __('indicator.messages.updated_successfully'));
-            
+
         } catch (\Throwable $e) {
-            
+
             Log::error('Indicator update failed', [
                 'message' => $e->getMessage(),
                 'data' => $data ?? [],
             ]);
-            
-            return to_route('indicators.edit', $indicator->id)
+
+            return redirect()
+                ->route('indicators.edit', $indicator->id)
+                ->setStatusCode(303)
                 ->withInput()
                 ->with('error', __('indicator.messages.updated_error'));
         }
     }
-    
+
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Indicator $indicator)
     {
         try {
-            
+
             $this->service->destroy($indicator);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => __('app.delete_success'),
             ]);
-            
+
         } catch (\Throwable $e) {
-            
+
             Log::error('Indicator delete failed', [
                 'message' => $e->getMessage(),
                 'data' => $indicator,
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => __('app.delete_error'),
             ], 500);
         }
     }
-    
+
     /**
      * API data endpoint (datatable / filters)
      */
@@ -148,14 +152,14 @@ class IndicatorController extends Controller
     {
         return $this->service->getData($request->all());
     }
-    
+
     /**
      * Filters (igual estilo que PairController)
      */
     private function getFilters(Request $request): array
     {
         return [
-            
+
             'code' => [
                 'value' => '',
                 'type' => 'text',
@@ -163,7 +167,7 @@ class IndicatorController extends Controller
                 'operator' => 'like',
                 'order_direction' => '',
             ],
-            
+
             'name' => [
                 'value' => '',
                 'type' => 'text',
@@ -171,7 +175,7 @@ class IndicatorController extends Controller
                 'operator' => 'like',
                 'order_direction' => '',
             ],
-            
+
             'handler' => [
                 'value' => '',
                 'type' => 'text',
@@ -179,7 +183,7 @@ class IndicatorController extends Controller
                 'operator' => '=',
                 'order_direction' => '',
             ],
-        
+
         ];
     }
 }
