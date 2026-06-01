@@ -9,7 +9,7 @@
       <div class="flex items-center">
         <div class="w-1/2">
           <h1 class="text-2xl font-bold">
-            {{ pair.symbol }} - {{ pair.exchange.name }}
+            {{ pair.symbol }} - {{ pair.exchange.name }} - {{current_price.toFixed(2)}} {{pair.quote_asset}}
           </h1>
         </div>
 
@@ -69,7 +69,7 @@
 import {Head} from '@inertiajs/vue3'
 import AppLayout from "@/Layouts/AppLayout.vue"
 import BaseSelect from "@/Components/BaseSelect.vue"
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, nextTick} from 'vue'
 import axios from 'axios'
 import {createChart} from 'lightweight-charts'
 import {useI18n} from "vue-i18n"
@@ -106,6 +106,7 @@ const indicatorSelects = ref([])
 const timeframe = ref('1m')
 const isLoading = ref(false)
 const showSecondaryChart = ref(false)
+const current_price = ref(0)
 
 let isRunning = false;
 let started = false;
@@ -115,11 +116,23 @@ function isSelected(indicator) {
 }
 
 async function toggleIndicator(indicator, checked) {
-  console.log(indicator.config)
   if (checked) {
+    
+    if (!indicator.config.main && !chart2.value) {
+      
+      showSecondaryChart.value = true
+      
+      await nextTick()
+      
+      initChart2()
+    }
+    
     indicatorSelects.value.push(indicator)
-    await initIndicatorValues(indicator.id)
+    
+    await initIndicatorValues(indicator)
+    
     await loadIndicatorValues(indicator.id)
+    
   }else {
     indicatorSelects.value = indicatorSelects.value.filter(i => i.id !== indicator.id)
     chart.value.removeSeries(indicatorValueSeries.value[indicator.id])
@@ -127,7 +140,7 @@ async function toggleIndicator(indicator, checked) {
     delete lastFromCandleIndicatorValue.value[indicator.id]
     delete lastToCandleIndicatorValue.value[indicator.id]
   }
-  showSecondaryChart.value = indicatorSelects.value.some(i => i.config.secondary)
+  showSecondaryChart.value = indicatorSelects.value.some(i => !i.config.main)
 }
 
 async function toggleTimeframe(timeframe){
@@ -157,6 +170,7 @@ function initChart() {
 }
 
 function initChart2() {
+  console.log('iniciando grafico secundario')
   chart2.value = createChart(chartContainer2.value, {
     layout: {
       background: { color: '#ffffff' },
@@ -165,18 +179,9 @@ function initChart2() {
     width: chartContainer2.value.clientWidth,
     height: 150,
   })
-
-  // 1. crear serie primero
-  rsiSeries.value = chart2.value.addLineSeries({
-    color: '#2962FF',
-    lineWidth: 2,
-  })
-
-  // 2. fijar escala RSI (IMPORTANTE usar 'right')
+  
   chart2.value.priceScale('right').applyOptions({
-    autoScale: false,
-    minValue: 0,
-    maxValue: 100,
+    autoScale: true,
   })
 }
 
@@ -203,6 +208,7 @@ async function loadCandles() {
     historicFirstCandle.value = candles[0].id
     last_candle_id.value = last_candle.id
     last_candle_time.value = last_candle.opened_at
+    current_price.value = last_candle.close
   }
 
   last_updated.value = new Date(res.data.last_updated * 1000).toLocaleString()
@@ -241,13 +247,21 @@ async function loadIndicatorValues(indicator) {
 
 
 async function initIndicatorValues(indicator) {
-
-  if(!indicatorValueSeries.value[indicator]){
-    indicatorValueSeries.value[indicator] =
-      chart.value.addLineSeries({
-        color: getColor(indicator),
-        lineWidth: 2,
-      })
+  console.log(indicator)
+  if(!indicatorValueSeries.value[indicator.id]){
+    if(indicator.config.main){
+      indicatorValueSeries.value[indicator.id] =
+        chart.value.addLineSeries({
+          color: getColor(indicator.id),
+          lineWidth: 2,
+        })
+    }else{
+      indicatorValueSeries.value[indicator.id] =
+        chart2.value.addLineSeries({
+          color: getColor(indicator.id ),
+          lineWidth: 2,
+        })
+    }
   }
 
 }
@@ -287,6 +301,7 @@ async function runSync() {
       for (const candle of formatedCandles) {
         if (candle.time >= last_candle_time.value) {
           candleSeries.value.update(candle);
+          current_price.value = candle.close
 
           if (candle.time !== last_candle_time.value) {
             last_candle_time.value = candle.time;
@@ -367,7 +382,6 @@ const getColor = ((id) => {
 
 onMounted(async() => {
   initChart()
-  initChart2()
   await loadCandles()
   loop();
 })
