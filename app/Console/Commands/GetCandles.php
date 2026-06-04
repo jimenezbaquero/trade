@@ -31,24 +31,41 @@ class GetCandles extends Command {
         $pair = $exchange->pairs()->where('symbol', $symbol)->firstOrFail();
         $live = $interval == 'live';
         
-        if ($interval == 'live') {
+        if ($live) {
             $intervals = [
                 '1m',
                 '5m',
                 '15m',
                 '1h'
             ];
+            
+            
+            $froms = [];
+            
+            foreach ($intervals as $interval) {
+                $lastCandle = $pair->candles()->where('timeframe', $interval)->latest('opened_at')->first();
+                if ($lastCandle) {
+                    $froms[$interval] = $lastCandle->opened_at
+                        ->subMinute()
+                        ->getTimestampMs();
+                } else {
+                    $froms[$interval] = now()
+                        ->subDay()
+                        ->getTimestampMs();
+                }
+                
+            }
         }
 
         $client = $exchangeManager->make($exchange);
 
         if(!$live) {
-            $this->updateCandles($client, $live, $pair, $symbol, $interval, $fromOption, $to);
+            $this->updateCandles($client, $live, $pair, $symbol, $interval, strtotime($fromOption) * 1000, $to);
         }else {
             while (true) {
                 $to = now()->getTimestampMs();
                 foreach ($intervals as $interval) {
-                    $this->updateCandles($client, $live, $pair, $symbol, $interval, $fromOption, $to);
+                    $froms[$interval] = $this->updateCandles($client, $live, $pair, $symbol, $interval, $froms[$interval], $to);
                 }
                 sleep(2);
             }
@@ -57,20 +74,9 @@ class GetCandles extends Command {
     }
 
     public function updateCandles($client, $live, Pair $pair, string $symbol, string $interval, $fromOption, $to) {
-        if (!$fromOption) {
-            $lastCandle = $pair->candles()->where('timeframe', $interval)->latest('opened_at')->first();
-            if ($lastCandle) {
-                $from = $lastCandle->opened_at
-                    ->subMinute()
-                    ->getTimestampMs();
-            } else {
-                $from = now()
-                    ->subDay()
-                    ->getTimestampMs();
-            }
-        } else {
-            $from = strtotime($fromOption) * 1000;
-        }
+        $from = $fromOption;
+        
+        $lastStartTimestamp = $fromOption;
 
         while ($from <= $to) {
             $klines = $client->klines(
@@ -89,7 +95,13 @@ class GetCandles extends Command {
             $numberKlines = count($klines);
             
             foreach ($klines as $index => $k) {
+                if($k[0] < $lastStartTimestamp){
+                    continue;
+                }
                 $isLast = $index === $numberKlines - 1;
+                if($isLast) {
+                    $lastStartTimestamp = $k[0];
+                }
 
                 $batch[] = [
                     'pair_id' => $pair->id,
@@ -169,7 +181,8 @@ class GetCandles extends Command {
                             'high',
                             'low',
                             'close',
-                            'volume'
+                            'volume',
+                            'is_closed'
                         ]);
                     
                     if ($dirty) {
@@ -182,5 +195,6 @@ class GetCandles extends Command {
             $last = end($klines);
             $from = $last[0] + 1;
         }
+        return $lastStartTimestamp;
     }
 }

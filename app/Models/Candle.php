@@ -51,7 +51,6 @@ class Candle extends Model
         // entero
         'trades_count' => 'integer',
     ];
-    
    
     public function pair(): BelongsTo
     {

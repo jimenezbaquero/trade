@@ -2,13 +2,16 @@
 
 namespace App\Providers;
 
+
+
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 // EVENTS
-use App\Events\CandleCreated;
-
+use App\Events\CandleChanged;
+use App\Events\IndicatorsCalculated;
 // LISTENERS
 use App\Listeners\HandleCandleChanged;
+use App\Listeners\HandleIndicatorsCalculated;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -16,11 +19,9 @@ class EventServiceProvider extends ServiceProvider
      * The event to listener mappings for the application.
      */
     protected $listen = [
-
-        // CANDLE EVENTS
-        CandleCreated::class => [
-            HandleCandleChanged::class,
-        ],
+        
+        CandleChanged::class => [HandleCandleChanged::class],
+        IndicatorsCalculated::class => [HandleIndicatorsCalculated::class],
 
     ];
 

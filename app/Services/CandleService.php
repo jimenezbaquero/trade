@@ -9,11 +9,11 @@ use Carbon\Carbon;
 class CandleService
 {
     private function queryCandles(
-        Pair $pair,
-        string $timeframe,
+        Pair    $pair,
+        string  $timeframe,
         ?string $from,
         ?string $to,
-        ?bool $live = false
+        ?bool   $live = false
     ) {
         $query = Candle::query()
             ->where('pair_id', $pair->id)
@@ -23,8 +23,12 @@ class CandleService
             $query = $query->orderBy('opened_at', 'desc')
                 ->limit(2);
         } else {
-            $query = $query->when($from, fn($q) => $q->where('opened_at', '>=', $from))
-                ->when($to, fn($q) => $q->where('opened_at', '<=', $to))
+            if (!$from) {
+                $query = $query->latest()->limit(20000);
+            } else {
+                $query = $query->when($from, fn($q) => $q->where('opened_at', '>=', $from));
+            }
+            $query = $query->when($to, fn($q) => $q->where('opened_at', '<=', $to))
                 ->orderBy('opened_at', 'asc');
         }
         
@@ -36,24 +40,22 @@ class CandleService
             'low',
             'close',
             'volume',
-        ]);
+        ])->sortBy('opened_at')->values();
     }
     
     public function getCandles(
-        Pair $pair,
-        string $timeframe = '1m',
+        Pair    $pair,
+        string  $timeframe = '1m',
         ?string $from = null,
         ?string $to = null
     ) {
-        if (!$from) {
-            $from = Carbon::now()->subDays(2);
-        }
+        
         
         $candles = $this->queryCandles($pair, $timeframe, $from, $to);
         
         $lastUpdated = $candles->last()?->opened_at?->timestamp;
         
-        $candles = $candles->map(fn ($c) => [
+        $candles = $candles->map(fn($c) => [
             'id' => $c->id,
             'open' => $c->open,
             'high' => $c->high,
@@ -70,7 +72,7 @@ class CandleService
     }
     
     public function getCandlesLive(
-        Pair $pair,
+        Pair   $pair,
         string $timeframe = '1m',
     ) {
         $to = Carbon::now();
@@ -105,7 +107,7 @@ class CandleService
             $candles[1] = $aux;
         }
         
-        $candles = $candles->map(fn ($c) => [
+        $candles = $candles->map(fn($c) => [
             'id' => $c->id,
             'open' => $c->open,
             'high' => $c->high,

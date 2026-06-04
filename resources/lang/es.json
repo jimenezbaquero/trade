@@ -84,7 +84,7 @@
 
   "pair.create_description": "Formulario para la creación de pares.",
   "pair.last_updated": "Última actualización",
-  "pair.last_candle": "Última vela",
+  "pair.last_candle": "Apertura última vela",
   "pair.title": "Par",
   "pair.title_plural": "Pares",
   "pair.timeframe_placeholder": "Seleccione un tiempo de vida",

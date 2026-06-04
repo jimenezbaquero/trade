@@ -6,6 +6,8 @@ use App\Calculators\EmaCalculator;
 use App\Calculators\RsiCalculator;
 use App\Models\Indicator;
 use App\Models\Candle;
+use App\Models\IndicatorValue;
+use Illuminate\Support\Facades\Log;
 
 class IndicatorCalculatorService
 {
@@ -15,27 +17,47 @@ class IndicatorCalculatorService
     ) {
         $candle = Candle::findOrFail($candleId);
         $indicator = Indicator::findOrFail($indicator_id);
+        $value = null;
         
-        switch ($indicator->code) {
-            case 'ema_20':
-                return EmaCalculator::calculate(
-                    $candle->close,
-                    $this->getPreviousValue($indicator_id, $candle),
-                    20
-                );
-            case 'ema_50':
-                return EmaCalculator::calculate(
-                    $candle->close,
-                    $this->getPreviousValue($indicator_id, $candle),
-                    50
-                );
-            case 'rsi_14':
-                return RsiCalculator::calculate(
-                    $this->getLastCandles(15, $candle),
-                    14
-                );
-            default:
-                throw new \Exception('Indicator not supported');
+        try {
+            switch ($indicator->code) {
+                case 'ema_20':
+                    $value = EmaCalculator::calculate(
+                        $candle->close,
+                        $this->getPreviousValue($indicator_id, $candle),
+                        20
+                    );
+                    break;
+                case 'ema_50':
+                    $value = EmaCalculator::calculate(
+                        $candle->close,
+                        $this->getPreviousValue($indicator_id, $candle),
+                        50
+                    );
+                    break;
+                case 'rsi_14':
+                    $value = RsiCalculator::calculate(
+                        $this->getLastCandles(15, $candle),
+                        14
+                    );
+                    break;
+                default:
+                    throw new \Exception('Indicator not supported '.$indicator->code);
+                    
+            }
+            
+            IndicatorValue::updateOrCreate(
+                [
+                    'indicator_id' => $indicator_id,
+                    'candle_id' => $candleId,
+                ],
+                [
+                    'value' => $value,
+                ]
+            );
+            
+        }catch (\Throwable $e){
+            Log::error($e->getMessage());
         }
     }
     

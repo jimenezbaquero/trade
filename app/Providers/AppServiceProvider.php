@@ -2,8 +2,9 @@
 
 namespace App\Providers;
 
-use App\Models\Candle;
+use App\Domain\Strategies\StrategyRegistry;
 use App\Observers\CandleObserver;
+use App\Services\StrategyService;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -14,7 +15,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(StrategyService::class, function ($app) {
+            return new StrategyService(
+                $app->make(StrategyRegistry::class)->get()
+            );
+        });
     }
 
     /**
