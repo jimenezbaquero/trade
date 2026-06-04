@@ -17,21 +17,20 @@ class CandleService
     ) {
         $query = Candle::query()
             ->where('pair_id', $pair->id)
-            ->where('timeframe', $timeframe);
-        
+            ->where('timeframe', $timeframe)
+            ->orderBy('opened_at', 'desc');
+
         if ($live) {
-            $query = $query->orderBy('opened_at', 'desc')
-                ->limit(2);
+            $query = $query->limit(2);
         } else {
             if (!$from) {
-                $query = $query->latest()->limit(20000);
+                $query = $query->limit(20000);
             } else {
                 $query = $query->when($from, fn($q) => $q->where('opened_at', '>=', $from));
             }
-            $query = $query->when($to, fn($q) => $q->where('opened_at', '<=', $to))
-                ->orderBy('opened_at', 'asc');
+            $query = $query->when($to, fn($q) => $q->where('opened_at', '<=', $to));
         }
-        
+
         return $query->get([
             'id',
             'opened_at',
@@ -42,19 +41,19 @@ class CandleService
             'volume',
         ])->sortBy('opened_at')->values();
     }
-    
+
     public function getCandles(
         Pair    $pair,
         string  $timeframe = '1m',
         ?string $from = null,
         ?string $to = null
     ) {
-        
-        
+
+
         $candles = $this->queryCandles($pair, $timeframe, $from, $to);
-        
+
         $lastUpdated = $candles->last()?->opened_at?->timestamp;
-        
+
         $candles = $candles->map(fn($c) => [
             'id' => $c->id,
             'open' => $c->open,
@@ -64,19 +63,19 @@ class CandleService
             'volume' => $c->volume,
             'opened_at' => $c->opened_at->timestamp,
         ])->values()->toArray();
-        
+
         return [
             'candles' => $candles,
             'last_updated' => $lastUpdated
         ];
     }
-    
+
     public function getCandlesLive(
         Pair   $pair,
         string $timeframe = '1m',
     ) {
         $to = Carbon::now();
-        
+
         switch ($timeframe) {
             case '1m':
                 $from = Carbon::now()->subMinutes(1);
@@ -94,19 +93,19 @@ class CandleService
                 $from = Carbon::now()->subMinutes(1);
                 break;
         }
-        
+
         $candles = $this->queryCandles($pair, $timeframe, $from, $to, true);
-        
+
         $lastUpdated = $candles->first()?->opened_at?->timestamp;
-        
+
         $candles = $candles->values();
-        
+
         if ($candles->count() >= 2) {
             $aux = $candles[0];
             $candles[0] = $candles[1];
             $candles[1] = $aux;
         }
-        
+
         $candles = $candles->map(fn($c) => [
             'id' => $c->id,
             'open' => $c->open,
@@ -116,7 +115,7 @@ class CandleService
             'volume' => $c->volume,
             'opened_at' => $c->opened_at->timestamp,
         ])->values()->toArray();
-        
+
         return [
             'candles' => $candles,
             'last_updated' => $lastUpdated
