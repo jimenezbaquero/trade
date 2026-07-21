@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FunnelHelper;
 use App\Http\Requests\IndicatorRequest;
 use App\Models\Indicator;
 use App\Presenters\IndicatorPresenter;
@@ -182,6 +183,15 @@ class IndicatorController extends Controller
                 'field' => 'handler',
                 'operator' => '=',
                 'order_direction' => '',
+            ],
+            'is_active' => [
+                'value' => true,
+                'type' => 'funnel',
+                'field' => 'is_active',
+                'operator' => '=',
+                'order_direction' => '',
+                'showFunnel' => false,
+                'options' => FunnelHelper::getOptions('is_active'),
             ],
 
         ];

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Indicator extends Model
 {
@@ -15,6 +16,7 @@ class Indicator extends Model
         'description',
         'config',
         'handler',
+        'is_active',
     ];
     
     /**
@@ -22,6 +24,7 @@ class Indicator extends Model
      */
     protected $casts = [
         'config' => 'array',
+        'is_active' => 'boolean',
     ];
     
     /*
@@ -60,5 +63,15 @@ class Indicator extends Model
     public function scopeHandler($query, string $handler)
     {
         return $query->where('handler', $handler);
+    }
+    
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+    
+    public function indicatorValues():HasMany
+    {
+        return $this->hasMany(IndicatorValue::class);
     }
 }

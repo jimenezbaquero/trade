@@ -37,6 +37,16 @@ class IndicatorPresenter
                 'type' => 'text',
                 'width' => '150px',
             ],
+            
+            'is_active' => [
+                'key' => 'is_active',
+                'field' => 'is_active',
+                'header' => 'exchange.fields.is_active',
+                'sortable' => false,
+                'filterable' => false,
+                'type' => 'funnel',
+                'width' => '150px'
+            ],
         
         ];
     }

@@ -42,6 +42,8 @@ return new class extends Migration
              */
             $table->json('config');
             
+            $table->boolean('is_active')->default(true);
+            
             $table->timestamps();
             
             // Evita duplicados de configs idénticas por código

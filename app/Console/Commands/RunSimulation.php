@@ -21,6 +21,8 @@ class RunSimulation extends Command
             $this->argument('simulationId')
         );
         
+        $simulation->simulatedsignals()->delete();
+        
         $this->info("Running simulation: {$simulation->name}");
         
         $strategyClass = '\\App\\Domain\\Strategies\\'.$simulation->strategy;
@@ -40,7 +42,7 @@ class RunSimulation extends Command
         
         foreach ($candles as $candle) {
             
-            $indicators = Indicator::where('id','<',4)->pluck('id')->toArray();
+            $indicators = Indicator::active()->pluck('id')->toArray();
             $indicatorValues = $candle->indicatorValues()->pluck('value','indicator_id')->toArray();
             $symbol = $candle->pair->symbol;
             $candleArray = $candle->toArray();

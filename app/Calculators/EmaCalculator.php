@@ -13,11 +13,20 @@ class EmaCalculator
         $k = 2 / ($period + 1);
         
         if ($previousValue === null) {
-            return ['value' => $candleClose];
+            return (
+                [
+                    'value' => $candleClose,
+                    'previous_value' => $previousValue
+                ]
+            );
+            
         }
         
         return (
-            ['value' => ($candleClose * $k) + ($previousValue * (1 - $k))]
+            [
+                'value' => ($candleClose * $k) + ($previousValue * (1 - $k)),
+                'previous_value' => $previousValue
+            ]
         );
     }
 }

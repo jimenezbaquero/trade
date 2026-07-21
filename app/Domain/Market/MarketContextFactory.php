@@ -14,7 +14,7 @@ class MarketContextFactory
         $values = [];
 
         foreach ($indicators as $indicator) {
-            $values[$indicator] = $indicatorValues[$indicator]['value'];
+            $values[$indicator] = $indicatorValues[$indicator];
         }
         
         return new MarketContext(

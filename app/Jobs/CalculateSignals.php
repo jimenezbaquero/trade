@@ -31,7 +31,7 @@ class CalculateSignals implements ShouldQueue
         $candle= Candle::findOrFail($this->candleId);
 
         if($candle->is_closed) {
-            $indicators = Indicator::where('id','<',4)->pluck('id')->toArray();
+            $indicators = Indicator::active()->pluck('id')->toArray();
             $indicatorValues = $candle->indicatorValues()->pluck('value','indicator_id')->toArray();
             $symbol = $candle->pair->symbol;
             $candle = $candle->toArray();

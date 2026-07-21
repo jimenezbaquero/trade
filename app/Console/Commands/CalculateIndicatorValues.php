@@ -13,7 +13,7 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
-#[Signature('indicatorValues:calculate {--indicator=} {--truncate=}' )]
+#[Signature('indicatorValues:calculate {--indicator=} {--delete=}' )]
 #[Description('Command description')]
 class CalculateIndicatorValues extends Command
 {
@@ -28,18 +28,23 @@ class CalculateIndicatorValues extends Command
      */
     public function handle()
     {
-        $truncate = $this->option('truncate') == 'yes';
-        if($truncate) {
-            DB::table('indicator_values')->truncate();
-        }
+        $delete = $this->option('delete') == 'yes';
 
         if(!is_null($this->option('indicator'))){
             $indicator = Indicator::where('code',$this->option('indicator'))->first();
             if(!is_null($indicator)){
                 $indicators = [$indicator];
+                if($delete) {
+                    $indicator->indicatorValues()->delete();
+                }
             }
         }else{
-            $indicators = Indicator::where('id','<',4)->get();
+            $indicators = Indicator::active()->get();
+            if($delete) {
+               foreach ($indicators as $indicator) {
+                   $indicator->indicatorValues()->delete();
+               }
+                }
         }
 
         $timeframes = ['1m', '5m', '15m', '1h'];
@@ -72,6 +77,16 @@ class CalculateIndicatorValues extends Command
                     $nRows++;
 
                     switch ($indicator->code) {
+                        
+                        case 'ema_10':
+                            $emaState = EmaCalculator::calculate(
+                                $candle->close,
+                                $emaState['value']??null,
+                                10
+                            );
+                            
+                            $value = $emaState;
+                            break;
 
                         case 'ema_20':
                             $emaState = EmaCalculator::calculate(

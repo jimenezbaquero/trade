@@ -23,7 +23,7 @@ class HandleCandleChanged
     public function handle(CandleChanged $event): void
     {
         $indicatorIds = Cache::remember('indicators_trading', 3600, function () {
-            return Indicator::where('id','<',4)->pluck('id')->toArray();
+            return Indicator::active()->pluck('id')->toArray();
         });
         
         CalculateIndicatorValues::dispatch($event->candleId, $indicatorIds)->onQueue('indicators');

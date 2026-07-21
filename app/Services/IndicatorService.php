@@ -28,6 +28,7 @@ class IndicatorService
                     'description' => $indicator->description,
                     'handler' => $indicator->handler,
                     'config' => $indicator->config,
+                    'is_active' => $indicator->is_active? __('app.yes') : __('app.no'),
                     
                     // útil para UI
                     'config_label' => $this->formatConfigLabel($indicator->config),
@@ -38,6 +39,7 @@ class IndicatorService
     public function store(array $data)
     {
         $data['code'] = strtolower($data['code']);
+        $data['is_active'] = $data['is_active'] ?? true;
         
         $indicator = Indicator::create($data);
         

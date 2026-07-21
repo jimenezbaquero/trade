@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SimulatedSignal extends Model
 {
@@ -27,6 +28,11 @@ class SimulatedSignal extends Model
     
     public function simulation(): BelongsTo {
         return $this->belongsTo(Simulation::class);
+    }
+    
+    public function simulatedDecisions(): HasMany
+    {
+        return $this->hasMany(SimulatedDecision::class);
     }
     
     public function pair():BelongsTo
